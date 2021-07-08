@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net5.0</TargetFramework>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Blake2Sharp\Blake2Sharp.csproj" />
+      <ProjectReference Include="..\Chaos.NaCl.Blake2\Chaos.NaCl.Blake2.csproj" />
+    </ItemGroup>
+
+</Project>
