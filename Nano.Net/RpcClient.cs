@@ -38,6 +38,15 @@ namespace Nano.Net
             return JsonConvert.DeserializeObject<T>(json);
         }
 
+        public async Task UpdateAccountAsync(Account account)
+        {
+            AccountInfoResponse accountInfo = await AccountInfoAsync(account);
+
+            account.Frontier = accountInfo.Frontier;
+            account.Balance = Amount.FromRaw(accountInfo.Balance);
+            account.Representative = accountInfo.Representative;
+        }
+        
         public async Task<AccountInfoResponse> AccountInfoAsync(Account account, bool representative = true)
         {
             return await RpcRequestAsync<AccountInfoResponse>(new

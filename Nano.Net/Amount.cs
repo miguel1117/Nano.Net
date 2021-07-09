@@ -6,17 +6,22 @@ namespace Nano.Net
     {
         public const double NanoInRaw = 1000000000000000000000000000000D;
 
-        public double Raw { get; init; }
+        public double Raw { get; }
         public double Nano => RawToNano(Raw);
+
+        public Amount(double rawAmount)
+        {
+            Raw = rawAmount;
+        }
 
         public static Amount FromRaw(string rawAmount)
         {
-            return new Amount() { Raw = double.Parse(rawAmount, CultureInfo.InvariantCulture) };
+            return new Amount(double.Parse(rawAmount, CultureInfo.InvariantCulture));
         }
 
         public static Amount FromNano(string nanoAmount)
         {
-            return new Amount() { Raw = NanoToRaw(nanoAmount) };
+            return new Amount(NanoToRaw(nanoAmount));
         }
 
         public static double RawToNano(double rawAmount)

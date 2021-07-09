@@ -5,26 +5,42 @@ namespace Nano.Net
 {
     public class Account
     {
-        public byte[] PrivateKey { get; }
-        public byte[] PublicKey { get; }
-        public string Address { get; }
+        public byte[] PrivateKey { get; private init; }
+        public byte[] PublicKey { get; private init; }
+        public string Address { get; private init; }
 
         public string Frontier { get; set; }
         public Amount Balance { get; set; }
         public string Representative { get; set; }
 
-        public Account(byte[] privateKey)
+        internal bool MissingInformation => Frontier is null || Balance is null || Representative is null;
+
+        private Account()
         {
-            PrivateKey = privateKey;
-            PublicKey = PublicKeyFromPrivateKey(PrivateKey);
-            Address = AddressFromPublicKey(PublicKey);
         }
 
-        public Account(string privateKey)
+        public static Account FromPrivateKey(byte[] privateKey)
         {
-            PrivateKey = HexToBytes(privateKey);
-            PublicKey = PublicKeyFromPrivateKey(PrivateKey);
-            Address = AddressFromPublicKey(PublicKey);
+            return new Account()
+            {
+                PrivateKey = privateKey,
+                PublicKey = PublicKeyFromPrivateKey(privateKey),
+                Address = AddressFromPublicKey(privateKey),
+            };
+        }
+
+        public static Account FromPrivateKey(string privateKey)
+        {
+            return FromPrivateKey(HexToBytes(privateKey));
+        }
+
+        public static Account FromAddress(string address)
+        {
+            return new Account()
+            {
+                PublicKey = PublicKeyFromAddress(address),
+                Address = address,
+            };
         }
     }
 }
