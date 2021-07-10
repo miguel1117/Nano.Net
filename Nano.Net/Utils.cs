@@ -96,7 +96,7 @@ namespace Nano.Net
             return publicKeyBytes;
         }
 
-        private static byte[] Blake2BHash(int sizeInBytes, byte[] data)
+        internal static byte[] Blake2BHash(int sizeInBytes, byte[] data)
         {
             Hasher hasher = Blake2B.Create(new Blake2BConfig() {OutputSizeInBytes = sizeInBytes});
             
