@@ -11,8 +11,18 @@ namespace Nano.Net.Tests
         private const string FirstAddress = "nano_3tjhazni9juaoa8q9rw33nf3f6i45gswhpzrgrbrawxhh7a777ror9okstch";
 
         [Fact]
+        public void HexToBytesTest()
+        {
+            HexToBytes("ABCD");
+            Assert.Throws<InvalidHexStringException>(() => HexToBytes("ABCDE")); // invalid hex string size, must be a multiple of 2
+            Assert.Throws<InvalidHexStringException>(() => HexToBytes("ABCK")); // invalid hex characters
+        }
+        
+        [Fact]
         public void DerivePrivateKeyTest()
         {
+            Assert.Throws<InvalidSeedException>(() => DerivePrivateKey(string.Empty, 0));
+
             Assert.Equal("A066701E0641E524662E3B7F67F98A248C300017BAA8AA0D91A95A2BCAF8D4D8",
                 BytesToHex(DerivePrivateKey(Seed, 0)),
                 true);
