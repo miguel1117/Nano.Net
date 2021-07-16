@@ -45,14 +45,14 @@ namespace Nano.Net
             return hex.ToString().ToUpper();
         }
 
-        public static byte[] GenerateSeed()
+        public static string GenerateSeed()
         {
             var seed = new byte[32];
             
             var rngCryptoServiceProvider = new RNGCryptoServiceProvider();
             rngCryptoServiceProvider.GetBytes(seed);
 
-            return seed;
+            return BytesToHex(seed);
         }
 
         private static string EncodeNanoBase32(byte[] data, bool padZeros = true)
@@ -105,13 +105,15 @@ namespace Nano.Net
             return hasher.Finish();
         }
         
-        public static byte[] DerivePrivateKey(byte[] seed, uint index)
+        public static byte[] DerivePrivateKey(string seed, uint index)
         {
             byte[] indexBytes = BitConverter.GetBytes(index);
             if (BitConverter.IsLittleEndian)
                 indexBytes = indexBytes.Reverse().ToArray();
 
-            return Blake2BHash(32, seed.Concat(indexBytes).ToArray());
+            byte[] seedBytes = HexToBytes(seed);
+            
+            return Blake2BHash(32, seedBytes.Concat(indexBytes).ToArray());
         }
 
         public static byte[] PublicKeyFromPrivateKey(byte[] privateKey)

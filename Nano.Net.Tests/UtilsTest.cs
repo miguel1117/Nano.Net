@@ -13,14 +13,12 @@ namespace Nano.Net.Tests
         [Fact]
         public void DerivePrivateKeyTest()
         {
-            byte[] seed = HexToBytes(Seed);
-
             Assert.Equal("A066701E0641E524662E3B7F67F98A248C300017BAA8AA0D91A95A2BCAF8D4D8",
-                BytesToHex(DerivePrivateKey(seed, 0)),
+                BytesToHex(DerivePrivateKey(Seed, 0)),
                 true);
 
             Assert.Equal("814CE3DB9F40AB48537D342E3FE34B8954A6A351FD89D0D5A5EFD2A25019FE04",
-                BytesToHex(DerivePrivateKey(seed, 468)),
+                BytesToHex(DerivePrivateKey(Seed, 468)),
                 true);
         }
 

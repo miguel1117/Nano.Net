@@ -12,11 +12,17 @@ namespace Nano.Net
         public string Frontier { get; set; }
         public Amount Balance { get; set; }
         public string Representative { get; set; }
-
+        
+        /// <summary>Whether all the properties for this account have been set.</summary>
         internal bool MissingInformation => Frontier is null || Balance is null || Representative is null;
 
         private Account()
         {
+        }
+
+        public static Account FromSeed(string seed, uint index)
+        {
+            return FromPrivateKey(DerivePrivateKey(seed, index));
         }
 
         public static Account FromPrivateKey(byte[] privateKey)
