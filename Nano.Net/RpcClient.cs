@@ -40,20 +40,41 @@ namespace Nano.Net
 
         public async Task UpdateAccountAsync(Account account)
         {
-            AccountInfoResponse accountInfo = await AccountInfoAsync(account);
+            AccountInfoResponse accountInfo = await AccountInfoAsync(account.Address);
 
             account.Frontier = accountInfo.Frontier;
             account.Balance = Amount.FromRaw(accountInfo.Balance);
             account.Representative = accountInfo.Representative;
         }
-        
-        public async Task<AccountInfoResponse> AccountInfoAsync(Account account, bool representative = true)
+
+        public async Task<AccountInfoResponse> AccountInfoAsync(string address, bool representative = true)
         {
             return await RpcRequestAsync<AccountInfoResponse>(new
             {
                 Action = "account_info",
-                Account = account.Address,
+                Account = address,
                 Representative = representative
+            });
+        }
+
+        public async Task<PendingBlocksResponse> PendingBlocksAsync(string address, int count = 5)
+        {
+            return await RpcRequestAsync<PendingBlocksResponse>(new
+            {
+                Action = "pending",
+                Account = address,
+                Count = count.ToString(),
+                IncludeOnlyConfirmed = true
+            });
+        }
+        
+        public async Task<BlockInfoResponse> BlockInfoAsync(string blockHash)
+        {
+            return await RpcRequestAsync<BlockInfoResponse>(new
+            {
+                Action = "block_info",
+                hash = blockHash,
+                json_block = true
             });
         }
     }

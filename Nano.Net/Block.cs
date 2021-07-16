@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Numerics;
 using Blake2Sharp;
+using Chaos.NaCl;
 using Newtonsoft.Json;
 using static Nano.Net.Utils;
 
@@ -11,15 +12,10 @@ namespace Nano.Net
     /// <summary>
     /// Represents a block. Can be created manually or using the CreateSendBlock and CreateReceiveBlock methods. Can be used in relevant RPC commands.
     /// </summary>
-    public class Block
+    public class Block : BlockBase
     {
-        [JsonProperty("type")] public string Type => "state";
-        [JsonProperty("account")] public string Account { get; init; }
-        [JsonProperty("previous")] public string Previous { get; init; }
-        [JsonProperty("representative")] public string Representative { get; init; }
-        [JsonProperty("balance")] public string Balance { get; init; }
-        [JsonProperty("link")] public string Link { get; init; }
-        [JsonIgnore] public BlockSubtype Subtype { get; init; }
+        [JsonProperty("signature")] public string Signature { get; private set; }
+        [JsonProperty("work")] public string Work { get; private set; }
 
         [JsonIgnore] public string Hash => GetHash();
 
@@ -30,6 +26,24 @@ namespace Nano.Net
         /// <param name="receiver">The address that will be receiving the funds.</param>
         /// <param name="amount">The amount of Nano being sent.</param>
         public static Block CreateSendBlock(Account sender, string receiver, Amount amount)
+        {
+            if (sender.MissingInformation)
+                throw new Exception("Not all properties for this account have been set.");
+
+            var block = new Block()
+            {
+                Account = sender.Address,
+                Previous = sender.Frontier,
+                Representative = sender.Representative,
+                Balance = (sender.Balance.Raw - amount.Raw).ToString("0"),
+                Link = receiver,
+                Subtype = BlockSubtype.Send
+            };
+
+            return block;
+        }
+
+        public static Block CreateReceiveBlock(Account sender, string receiver, Amount amount)
         {
             if (sender.MissingInformation)
                 throw new Exception("Not all properties for this account have been set.");
@@ -74,6 +88,18 @@ namespace Nano.Net
             byte[] final = Blake2BHash(32, bytes.ToArray());
 
             return BytesToHex(final);
+        }
+
+        public void Sign(byte[] privateKey)
+        {
+            Ed25519.KeyPairFromSeed(out byte[] publicKey, out byte[] expandedPrivateKey, privateKey);
+
+            if (publicKey != PublicKeyFromAddress(Account))
+                throw new Exception("The private key doesn't match this block's account");
+
+            byte[] signatureBytes = Ed25519.Sign(HexToBytes(Hash), expandedPrivateKey);
+
+            Signature = BytesToHex(signatureBytes);
         }
     }
 }

@@ -1,4 +1,5 @@
 using System;
+using Nano.Net.Response;
 using Xunit;
 
 namespace Nano.Net.Tests
@@ -10,12 +11,28 @@ namespace Nano.Net.Tests
         [Fact]
         public async void UpdateAccountInfoTest()
         {
-            Account account = Account.FromAddress(Constants.StaticNanoAddress);
+            Account account = Account.FromAddress(Constants.ReferenceAccount);
             await _rpcClient.UpdateAccountAsync(account);
             
             Assert.Equal("3865BFCD423CE3579C4A7C6010CE763BE4C63964AC06BDA451A63BBCAC9E3712", account.Frontier, true);
             Assert.Equal(Amount.FromRaw("15000000000000000000000000000").Raw, account.Balance.Raw);
             Assert.Equal("nano_18shbirtzhmkf7166h39nowj9c9zrpufeg75bkbyoobqwf1iu3srfm9eo3pz", account.Representative, true);
+        }
+
+        [Fact]
+        public async void PendingBlockTest()
+        {
+            PendingBlocksResponse pendingBlocks = await _rpcClient.PendingBlocksAsync(Constants.ReferenceAccount);
+            Assert.NotNull(pendingBlocks.Blocks);
+        }
+        
+        [Fact]
+        public async void BlockInfoTest()
+        {
+            BlockInfoResponse blockInfo = await _rpcClient.BlockInfoAsync("75F0B821DE3B25908755520117660E1297DDEA774DEC817FAA2C27221442403A");
+            
+            Assert.Equal("nano_3r9rdhbipf9xsnpxdhf7h7kebo8iyfefc9s3bcx4racody5wubz1y1kzaon9", blockInfo.Contents.Account, true);
+            Assert.NotNull(blockInfo.Contents.Previous);
         }
     }
 }
