@@ -6,7 +6,7 @@ namespace Nano.Net
     {
         public const double NanoInRaw = 1000000000000000000000000000000D;
 
-        public double Raw { get; }
+        public double Raw { get; } // TODO BigInteger is probably a better choice than double here
         public double Nano => RawToNano(Raw);
 
         public Amount(double rawAmount)

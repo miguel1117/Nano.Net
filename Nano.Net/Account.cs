@@ -39,14 +39,5 @@ namespace Nano.Net
         {
             return FromPrivateKey(HexToBytes(privateKey));
         }
-
-        public static Account FromAddress(string address)
-        {
-            return new Account()
-            {
-                PublicKey = PublicKeyFromAddress(address),
-                Address = address,
-            };
-        }
     }
 }

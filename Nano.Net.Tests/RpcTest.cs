@@ -11,12 +11,11 @@ namespace Nano.Net.Tests
         [Fact]
         public async void UpdateAccountInfoTest()
         {
-            Account account = Account.FromAddress(Constants.ReferenceAccount);
-            await _rpcClient.UpdateAccountAsync(account);
+            AccountInfoResponse accountInfo = await _rpcClient.AccountInfoAsync(Constants.ReferenceAccount);
             
-            Assert.Equal("3865BFCD423CE3579C4A7C6010CE763BE4C63964AC06BDA451A63BBCAC9E3712", account.Frontier, true);
-            Assert.Equal(Amount.FromRaw("15000000000000000000000000000").Raw, account.Balance.Raw);
-            Assert.Equal("nano_18shbirtzhmkf7166h39nowj9c9zrpufeg75bkbyoobqwf1iu3srfm9eo3pz", account.Representative, true);
+            Assert.Equal("3865BFCD423CE3579C4A7C6010CE763BE4C63964AC06BDA451A63BBCAC9E3712", accountInfo.Frontier, true);
+            Assert.Equal("15000000000000000000000000000", accountInfo.Balance, true);
+            Assert.Equal("nano_18shbirtzhmkf7166h39nowj9c9zrpufeg75bkbyoobqwf1iu3srfm9eo3pz", accountInfo.Representative, true);
         }
 
         [Fact]
