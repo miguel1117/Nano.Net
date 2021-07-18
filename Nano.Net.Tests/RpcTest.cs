@@ -22,16 +22,7 @@ namespace Nano.Net.Tests
         public async void PendingBlockTest()
         {
             PendingBlocksResponse pendingBlocks = await _rpcClient.PendingBlocksAsync(Constants.ReferenceAccount);
-            Assert.NotNull(pendingBlocks.Blocks);
-        }
-        
-        [Fact]
-        public async void BlockInfoTest()
-        {
-            BlockInfoResponse blockInfo = await _rpcClient.BlockInfoAsync("75F0B821DE3B25908755520117660E1297DDEA774DEC817FAA2C27221442403A");
-            
-            Assert.Equal("nano_3r9rdhbipf9xsnpxdhf7h7kebo8iyfefc9s3bcx4racody5wubz1y1kzaon9", blockInfo.Contents.Account, true);
-            Assert.NotNull(blockInfo.Contents.Previous);
+            Assert.NotEmpty(pendingBlocks.PendingBlocks);
         }
     }
 }

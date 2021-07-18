@@ -1,6 +1,8 @@
 ﻿// This is a modified version of the code from https://github.com/Flufd/NanoDotNet/blob/master/NanoDotNet/NanoRpcClient.cs
 
 
+using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
@@ -59,23 +61,24 @@ namespace Nano.Net
 
         public async Task<PendingBlocksResponse> PendingBlocksAsync(string address, int count = 5)
         {
-            return await RpcRequestAsync<PendingBlocksResponse>(new
+            var pendingBlocks = await RpcRequestAsync<PendingBlocksResponse>(new
             {
                 Action = "pending",
                 Account = address,
                 Count = count.ToString(),
+                Source = true,
                 IncludeOnlyConfirmed = true
             });
+
+            foreach ((string key, PendingBlock value) in pendingBlocks.PendingBlocks)
+                value.Hash = key;
+
+            return pendingBlocks;
         }
         
-        public async Task<BlockInfoResponse> BlockInfoAsync(string blockHash)
+        public async void BlockInfoAsync(string blockHash)
         {
-            return await RpcRequestAsync<BlockInfoResponse>(new
-            {
-                Action = "block_info",
-                hash = blockHash,
-                json_block = true
-            });
+            throw new NotImplementedException();
         }
     }
 }

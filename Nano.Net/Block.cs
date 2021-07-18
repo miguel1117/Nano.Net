@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Numerics;
 using Blake2Sharp;
 using Chaos.NaCl;
+using Nano.Net.Response;
 using Newtonsoft.Json;
 using static Nano.Net.Utils;
 
@@ -14,9 +15,6 @@ namespace Nano.Net
     /// </summary>
     public class Block : BlockBase
     {
-        [JsonProperty("signature")] public string Signature { get; private set; }
-        [JsonProperty("work")] public string Work { get; private set; }
-
         [JsonIgnore] public string Hash => GetHash();
 
         /// <summary>
@@ -39,26 +37,33 @@ namespace Nano.Net
                 Link = receiver,
                 Subtype = BlockSubtype.Send
             };
+            
+            block.Sign(sender.PrivateKey);
 
             return block;
         }
 
-        public static Block CreateReceiveBlock(Account sender, string receiver, Amount amount)
+        public static Block CreateReceiveBlock(Account receiver, string blockHash, Amount amount)
         {
-            if (sender.MissingInformation)
+            if (receiver.MissingInformation)
                 throw new Exception("Not all properties for this account have been set.");
 
             var block = new Block()
             {
-                Account = sender.Address,
-                Previous = sender.Frontier,
-                Representative = sender.Representative,
-                Balance = (sender.Balance.Raw - amount.Raw).ToString("0"),
-                Link = receiver,
+                Account = receiver.Address,
+                Previous = receiver.Frontier,
+                Representative = receiver.Representative,
+                Balance = (receiver.Balance.Raw - amount.Raw).ToString("0"),
+                Link = blockHash,
                 Subtype = BlockSubtype.Send
             };
 
             return block;
+        }
+
+        public static Block CreateReceiveBlock(Account receiver, PendingBlock pendingBlock)
+        {
+            return CreateReceiveBlock(receiver, pendingBlock.Hash, Amount.FromRaw(pendingBlock.Amount));
         }
 
         public string GetHash()

@@ -1,9 +1,10 @@
-﻿using Newtonsoft.Json;
+﻿using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace Nano.Net.Response
 {
     public class PendingBlocksResponse
     {
-        [JsonProperty("blocks")] public string[] Blocks { get; init; }
+        [JsonProperty("blocks")] public Dictionary<string, PendingBlock> PendingBlocks { get; init; }
     }
 }
