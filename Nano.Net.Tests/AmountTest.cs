@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+﻿using System.Numerics;
 using Xunit;
 
 namespace Nano.Net.Tests
@@ -6,21 +6,15 @@ namespace Nano.Net.Tests
     public class AmountTest
     {
         [Fact]
-        public void AmountFromRawTest()
+        public void NanoToRawTest()
         {
-            Assert.Equal(
-                double.Parse("78.9654", CultureInfo.InvariantCulture),
-                Amount.FromRaw("78965400000000000000000000000000").Nano
-            );
+            Assert.Equal(BigInteger.Parse("10516572890244336648297290184986670415"), Amount.NanoToRaw("10516572.890244336648297290184986670415"));
         }
 
         [Fact]
-        public void AmountFromNanoTest()
+        public void RawToNanoTest()
         {
-            Assert.Equal(
-                double.Parse("78965400000000000000000000000000"),
-                Amount.FromNano("78.9654").Raw
-            );
+            Assert.Equal("10516572.890244336648297290184986670415", Amount.RawToNano("10516572890244336648297290184986670415"));
         }
     }
 }

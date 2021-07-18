@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Numerics;
-using Blake2Sharp;
 using Chaos.NaCl;
 using Nano.Net.Response;
 using Newtonsoft.Json;
@@ -37,7 +35,7 @@ namespace Nano.Net
                 Link = receiver,
                 Subtype = BlockSubtype.Send
             };
-            
+
             block.Sign(sender.PrivateKey);
 
             return block;

@@ -1,22 +1,28 @@
-﻿using System.Globalization;
+﻿using System;
+using System.Globalization;
+using System.Numerics;
 
 namespace Nano.Net
 {
     public class Amount
     {
-        public const double NanoInRaw = 1000000000000000000000000000000D;
+        public static readonly BigInteger NanoInRaw = BigInteger.Parse("1000000000000000000000000000000");
 
-        public double Raw { get; } // TODO BigInteger is probably a better choice than double here
-        public double Nano => RawToNano(Raw);
+        public BigInteger Raw { get; }
 
-        public Amount(double rawAmount)
+        /// <summary>
+        /// 
+        /// </summary>
+        public string Nano => RawToNano(Raw);
+
+        private Amount(BigInteger rawAmount)
         {
             Raw = rawAmount;
         }
 
         public static Amount FromRaw(string rawAmount)
         {
-            return new Amount(double.Parse(rawAmount, CultureInfo.InvariantCulture));
+            return new Amount(BigInteger.Parse(rawAmount));
         }
 
         public static Amount FromNano(string nanoAmount)
@@ -24,31 +30,31 @@ namespace Nano.Net
             return new Amount(NanoToRaw(nanoAmount));
         }
 
-        public static double RawToNano(double rawAmount)
+        public static string RawToNano(BigInteger rawAmount)
         {
-            return rawAmount / NanoInRaw;
+            BigInteger result = BigInteger.DivRem(rawAmount, NanoInRaw, out BigInteger remainder);
+
+            return $"{result}.{remainder}"; // only way I know of to not lose precision
         }
 
-        public static double RawToNano(string rawAmount)
+        public static string RawToNano(string rawAmount)
         {
-            double raw = double.Parse(rawAmount, CultureInfo.InvariantCulture);
-            return RawToNano(raw);
+            return RawToNano(BigInteger.Parse(rawAmount));
         }
 
-        public static double NanoToRaw(double nanoAmount)
+        public static BigInteger NanoToRaw(string nanoAmount)
         {
-            return nanoAmount * NanoInRaw;
-        }
+            if (!decimal.TryParse(nanoAmount, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out decimal _))
+                throw new FormatException();
 
-        public static double NanoToRaw(string nanoAmount)
-        {
-            double nano = double.Parse(nanoAmount, CultureInfo.InvariantCulture);
-            return NanoToRaw(nano);
+            string[] nano = nanoAmount.Split("."); // split the integer and decimal part
+
+            return BigInteger.Parse(nano[0] + nano[1].PadRight(30, '0'));
         }
 
         public override string ToString()
         {
-            return Nano.ToString(CultureInfo.InvariantCulture);
+            return Raw.ToString();
         }
     }
 }
