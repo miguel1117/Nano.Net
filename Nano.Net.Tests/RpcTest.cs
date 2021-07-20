@@ -19,6 +19,12 @@ namespace Nano.Net.Tests
         }
 
         [Fact]
+        public async void RpcErrorTest()
+        {
+            await Assert.ThrowsAsync<RpcException>(async () => await _rpcClient.AccountInfoAsync("0"));
+        }
+
+        [Fact]
         public async void PendingBlockTest()
         {
             PendingBlocksResponse pendingBlocks = await _rpcClient.PendingBlocksAsync(Constants.ReferenceAccount);

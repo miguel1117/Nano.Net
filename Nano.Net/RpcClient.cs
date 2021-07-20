@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Nano.Net.Response;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
 
 namespace Nano.Net
@@ -36,6 +37,12 @@ namespace Nano.Net
             var content = new StringContent(JsonConvert.SerializeObject(request, _jsonSerializerSettings), Encoding.UTF8, "application/json");
             HttpResponseMessage response = await _httpClient.PostAsync(NodeAddress, content);
             string json = await response.Content.ReadAsStringAsync();
+
+            if (json.Contains("\"error\":"))
+            {
+                JObject errorMessage = JObject.Parse(json);
+                throw new RpcException($"RPC call returned error. Message: {errorMessage["error"]}");
+            }
 
             return JsonConvert.DeserializeObject<T>(json);
         }
