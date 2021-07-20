@@ -39,16 +39,9 @@ namespace Nano.Net
 
             return JsonConvert.DeserializeObject<T>(json);
         }
-
-        public async Task UpdateAccountAsync(Account account)
-        {
-            AccountInfoResponse accountInfo = await AccountInfoAsync(account.Address);
-
-            account.Frontier = accountInfo.Frontier;
-            account.Balance = Amount.FromRaw(accountInfo.Balance);
-            account.Representative = accountInfo.Representative;
-        }
-
+        
+        // Default node RPC calls
+        
         public async Task<AccountInfoResponse> AccountInfoAsync(string address, bool representative = true)
         {
             return await RpcRequestAsync<AccountInfoResponse>(new
@@ -76,9 +69,15 @@ namespace Nano.Net
             return pendingBlocks;
         }
         
-        public async void BlockInfoAsync(string blockHash)
+        // Custom calls
+        
+        public async Task UpdateAccountAsync(Account account)
         {
-            throw new NotImplementedException();
+            AccountInfoResponse accountInfo = await AccountInfoAsync(account.Address);
+
+            account.Frontier = accountInfo.Frontier;
+            account.Balance = Amount.FromRaw(accountInfo.Balance);
+            account.Representative = accountInfo.Representative;
         }
     }
 }
