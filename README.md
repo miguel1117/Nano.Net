@@ -7,6 +7,8 @@ Still in development, many features are missing.
 * Seed derivation
 * Keypair and address generation
 * Local block signing
+* RPC client for interacting with the network
+* Nano unit converter
 
 ## Acknowledgements
 * [NanoDotNet](https://github.com/Flufd/NanoDotNet) for bits of code, including the Nano base32 implementation
