@@ -6,7 +6,7 @@ namespace Nano.Net.Tests
 {
     public class RpcTest
     {
-        private RpcClient _rpcClient = new RpcClient(Constants.NodeAddress);
+        private readonly RpcClient _rpcClient = new RpcClient(Constants.NodeAddress);
 
         [Fact]
         public async void UpdateAccountInfoTest()
@@ -29,6 +29,16 @@ namespace Nano.Net.Tests
         {
             PendingBlocksResponse pendingBlocks = await _rpcClient.PendingBlocksAsync(Constants.ReferenceAccount);
             Assert.NotEmpty(pendingBlocks.PendingBlocks);
+        }
+        
+        [Fact]
+        public async void WorkGenerateTest()
+        {
+            const string hash = "3865BFCD423CE3579C4A7C6010CE763BE4C63964AC06BDA451A63BBCAC9E3712";
+            WorkGenerateResponse workGenerate = await _rpcClient.WorkGenerateAsync(hash);
+            
+            Assert.Equal(hash, workGenerate.Hash);
+            Assert.NotNull(workGenerate.Work);
         }
 
         [Fact]

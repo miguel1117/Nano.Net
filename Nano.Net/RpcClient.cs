@@ -58,6 +58,16 @@ namespace Nano.Net
                 Representative = representative
             });
         }
+        
+        /// <summary>WARNING: This command is usually disabled on public nodes. You need to use your own node.</summary>
+        public async Task<WorkGenerateResponse> WorkGenerateAsync(string hash)
+        {
+            return await RpcRequestAsync<WorkGenerateResponse>(new
+            {
+                Action = "work_generate",
+                Hash = hash
+            });
+        }
 
         public async Task<PendingBlocksResponse> PendingBlocksAsync(string address, int count = 5)
         {
