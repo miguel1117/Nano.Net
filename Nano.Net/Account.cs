@@ -27,11 +27,14 @@ namespace Nano.Net
 
         public static Account FromPrivateKey(byte[] privateKey)
         {
+            byte[] publicKey = PublicKeyFromPrivateKey(privateKey);
+            string address = AddressFromPublicKey(publicKey);
+            
             return new Account()
             {
                 PrivateKey = privateKey,
-                PublicKey = PublicKeyFromPrivateKey(privateKey),
-                Address = AddressFromPublicKey(privateKey),
+                PublicKey = publicKey,
+                Address = address
             };
         }
 
