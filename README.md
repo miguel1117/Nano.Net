@@ -1,14 +1,15 @@
 # Nano.Net
 A .NET library for [Nano](https://nano.org).
-Still in development, many features are missing.
+Still in development. Please feel free to submit any changes, bugfixes or new features with pull requests.
 
 
 ## Features
-* Seed derivation
-* Keypair and address generation
-* Local block signing
-* RPC client for interacting with the network
-* Nano unit converter
+* [x] Seed generation and derivation
+* [x] Keypair and address generation
+* [x] Local block signing
+* [x] RPC client for interacting with the network
+* [ ] Unit conversion
+* [ ] Local work generation
 
 ## Acknowledgements
 * [NanoDotNet](https://github.com/Flufd/NanoDotNet) for bits of code, including the Nano base32 implementation
