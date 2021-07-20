@@ -1,9 +1,9 @@
 ﻿namespace Nano.Net
 {
-    public enum BlockSubtype
+    public static class BlockSubtype // a class is used here instead of an enum because the block subtype needs to be included in the process command
     {
-        Send,
-        Receive,
-        Change
+        public const string Send = "send";
+        public const string Receive = "receive";
+        public const string Change = "change";
     }
 }

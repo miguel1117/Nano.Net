@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
 using Chaos.NaCl;
 using Nano.Net.Response;
@@ -14,6 +15,8 @@ namespace Nano.Net
     public class Block : BlockBase
     {
         [JsonIgnore] public string Hash => GetHash();
+        
+        private const string MissingInformationError = "Not all properties for this account have been set. Please update this account's properties manually or use the RpcClient UpdateAccountAsync method.";
 
         /// <summary>
         /// Create a send block and sign it. Requires the account object to have all the properties correctly set.
@@ -21,10 +24,14 @@ namespace Nano.Net
         /// <param name="sender">The account that will send the funds.</param>
         /// <param name="receiver">The address that will be receiving the funds.</param>
         /// <param name="amount">The amount of Nano being sent.</param>
-        public static Block CreateSendBlock(Account sender, string receiver, Amount amount)
+        /// <param name="powNonce">The PoW nonce generated from the frontier block hash for this account.</param>
+        public static Block CreateSendBlock(Account sender, string receiver, Amount amount, string powNonce)
         {
             if (sender.MissingInformation)
-                throw new Exception("Not all properties for this account have been set.");
+                throw new Exception(MissingInformationError);
+
+            if (amount.Raw > sender.Balance.Raw)
+                throw new Exception("Insufficient balance.");
 
             var block = new Block()
             {
@@ -33,6 +40,7 @@ namespace Nano.Net
                 Representative = sender.Representative,
                 Balance = (sender.Balance.Raw - amount.Raw).ToString("0"),
                 Link = receiver,
+                Work = powNonce,
                 Subtype = BlockSubtype.Send
             };
 
@@ -41,27 +49,30 @@ namespace Nano.Net
             return block;
         }
 
-        public static Block CreateReceiveBlock(Account receiver, string blockHash, Amount amount)
+        public static Block CreateReceiveBlock(Account receiver, string blockHash, Amount amount, string powNonce)
         {
             if (receiver.MissingInformation)
-                throw new Exception("Not all properties for this account have been set.");
+                throw new Exception(MissingInformationError);
 
             var block = new Block()
             {
                 Account = receiver.Address,
                 Previous = receiver.Frontier,
                 Representative = receiver.Representative,
-                Balance = (receiver.Balance.Raw - amount.Raw).ToString("0"),
+                Balance = (receiver.Balance.Raw + amount.Raw).ToString("0"),
                 Link = blockHash,
-                Subtype = BlockSubtype.Send
+                Work = powNonce,
+                Subtype = BlockSubtype.Receive
             };
+
+            block.Sign(receiver.PrivateKey);
 
             return block;
         }
 
-        public static Block CreateReceiveBlock(Account receiver, PendingBlock pendingBlock)
+        public static Block CreateReceiveBlock(Account receiver, PendingBlock pendingBlock, string powNonce)
         {
-            return CreateReceiveBlock(receiver, pendingBlock.Hash, Amount.FromRaw(pendingBlock.Amount));
+            return CreateReceiveBlock(receiver, pendingBlock.Hash, Amount.FromRaw(pendingBlock.Amount), powNonce);
         }
 
         public string GetHash()

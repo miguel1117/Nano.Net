@@ -14,6 +14,6 @@ namespace Nano.Net
         [JsonProperty("signature")] public string Signature { get; set; }
         [JsonProperty("work")] public string Work { get; set; }
         
-        [JsonIgnore] public BlockSubtype Subtype { get; init; }
+        [JsonIgnore] public string Subtype { get; init; }
     }
 }

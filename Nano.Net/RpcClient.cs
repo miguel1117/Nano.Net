@@ -46,9 +46,9 @@ namespace Nano.Net
 
             return JsonConvert.DeserializeObject<T>(json);
         }
-        
+
         // Default node RPC calls
-        
+
         public async Task<AccountInfoResponse> AccountInfoAsync(string address, bool representative = true)
         {
             return await RpcRequestAsync<AccountInfoResponse>(new
@@ -75,9 +75,26 @@ namespace Nano.Net
 
             return pendingBlocks;
         }
-        
+
+        public async Task<ProcessResponse> ProcessAsync(Block block)
+        {
+            if (block.Signature is null)
+                throw new Exception("This block hasn't been signed yet.");
+            
+            if (block.Work is null)
+                throw new Exception("The PoW nonce for this block hasn't been set.");
+            
+            return await RpcRequestAsync<ProcessResponse>(new
+            {
+                Action = "process",
+                JsonBlock = true,
+                Subtype = block.Subtype,
+                Block = block
+            });
+        }
+
         // Custom calls
-        
+
         public async Task UpdateAccountAsync(Account account)
         {
             AccountInfoResponse accountInfo = await AccountInfoAsync(account.Address);

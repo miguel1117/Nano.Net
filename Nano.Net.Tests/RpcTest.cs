@@ -30,5 +30,27 @@ namespace Nano.Net.Tests
             PendingBlocksResponse pendingBlocks = await _rpcClient.PendingBlocksAsync(Constants.ReferenceAccount);
             Assert.NotEmpty(pendingBlocks.PendingBlocks);
         }
+
+        [Fact]
+        public async void SendBlockTest()
+        {
+            /*Account account = Account.FromPrivateKey();
+            await _rpcClient.UpdateAccountAsync(account);
+            
+            var block = Block.CreateSendBlock();
+
+            await _rpcClient.ProcessAsync(block);*/
+        }
+        
+        [Fact]
+        public async void ReceiveBlockTest()
+        {
+            /*Account account = Account.FromPrivateKey();
+            await _rpcClient.UpdateAccountAsync(account);
+            
+            var block = Block.CreateReceiveBlock();
+
+            await _rpcClient.ProcessAsync(block);*/
+        }
     }
 }
