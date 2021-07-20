@@ -97,7 +97,7 @@ namespace Nano.Net
         {
             Ed25519.KeyPairFromSeed(out byte[] publicKey, out byte[] expandedPrivateKey, privateKey);
 
-            if (publicKey != PublicKeyFromAddress(Account))
+            if (!PublicKeyFromPrivateKey(privateKey).SequenceEqual(PublicKeyFromAddress(Account)))
                 throw new Exception("The private key doesn't match this block's account");
 
             byte[] signatureBytes = Ed25519.Sign(HexToBytes(Hash), expandedPrivateKey);
