@@ -68,7 +68,7 @@ namespace Nano.Net
                     throw;
             }
         }
-        
+
         /// <summary>WARNING: This command is usually disabled on public nodes. You need to use your own node.</summary>
         public async Task<WorkGenerateResponse> WorkGenerateAsync(string hash)
         {
@@ -100,10 +100,10 @@ namespace Nano.Net
         {
             if (block.Signature is null)
                 throw new Exception("This block hasn't been signed yet.");
-            
+
             if (block.Work is null)
                 throw new Exception("The PoW nonce for this block hasn't been set.");
-            
+
             return await RpcRequestAsync<ProcessResponse>(new
             {
                 Action = "process",
@@ -117,8 +117,22 @@ namespace Nano.Net
 
         public async Task UpdateAccountAsync(Account account)
         {
-            AccountInfoResponse accountInfo = await AccountInfoAsync(account.Address);
+            AccountInfoResponse accountInfo;
 
+            try
+            {
+                accountInfo = await AccountInfoAsync(account.Address);
+            }
+            catch (UnopenedAccountException)
+            {
+                account.Opened = false;
+                account.Frontier = new string('0', 64);
+                account.Balance = Amount.FromRaw("0");
+                account.Representative = account.Address;
+                return;
+            }
+            
+            account.Opened = true;
             account.Frontier = accountInfo.Frontier;
             account.Balance = Amount.FromRaw(accountInfo.Balance);
             account.Representative = accountInfo.Representative;

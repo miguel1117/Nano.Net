@@ -9,10 +9,11 @@ namespace Nano.Net
         public byte[] PublicKey { get; private init; }
         public string Address { get; private init; }
 
+        public bool Opened { get; set; } = true;
         public string Frontier { get; set; }
         public Amount Balance { get; set; }
         public string Representative { get; set; }
-        
+
         /// <summary>Whether all the properties for this account have been set.</summary>
         internal bool MissingInformation => Frontier is null || Balance is null || Representative is null;
 

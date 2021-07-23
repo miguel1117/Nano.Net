@@ -27,6 +27,9 @@ namespace Nano.Net
         /// <param name="powNonce">The PoW nonce generated from the frontier block hash for this account.</param>
         public static Block CreateSendBlock(Account sender, string receiver, Amount amount, string powNonce)
         {
+            if (!sender.Opened)
+                throw new UnopenedAccountException();
+
             if (sender.MissingInformation)
                 throw new Exception(MissingInformationError);
 

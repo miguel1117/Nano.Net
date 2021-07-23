@@ -10,9 +10,5 @@ namespace Nano.Net
         {
             OriginalError = errorMessage;
         }
-
-        protected RpcException()
-        {
-        }
     }
 }

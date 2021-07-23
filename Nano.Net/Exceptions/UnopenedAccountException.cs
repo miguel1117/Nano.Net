@@ -1,8 +1,10 @@
-﻿namespace Nano.Net
+﻿using System;
+
+namespace Nano.Net
 {
-    public class UnopenedAccountException : RpcException
+    public class UnopenedAccountException : Exception
     {
-        public UnopenedAccountException()
+        public UnopenedAccountException() : base("This account hasn't been opened yet.")
         {
         }
     }
