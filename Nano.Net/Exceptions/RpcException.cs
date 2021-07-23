@@ -4,7 +4,14 @@ namespace Nano.Net
 {
     public class RpcException : Exception
     {
-        public RpcException(string message) : base(message)
+        public string OriginalError { get; }
+
+        public RpcException(string errorMessage) : base($"RPC call returned error. Message: {errorMessage}")
+        {
+            OriginalError = errorMessage;
+        }
+
+        protected RpcException()
         {
         }
     }

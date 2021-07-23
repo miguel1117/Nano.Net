@@ -41,7 +41,7 @@ namespace Nano.Net
             if (json.Contains("\"error\":"))
             {
                 JObject errorMessage = JObject.Parse(json);
-                throw new RpcException($"RPC call returned error. Message: {errorMessage["error"]}");
+                throw new RpcException(errorMessage["error"]?.ToString());
             }
 
             return JsonConvert.DeserializeObject<T>(json);
@@ -51,12 +51,22 @@ namespace Nano.Net
 
         public async Task<AccountInfoResponse> AccountInfoAsync(string address, bool representative = true)
         {
-            return await RpcRequestAsync<AccountInfoResponse>(new
+            try
             {
-                Action = "account_info",
-                Account = address,
-                Representative = representative
-            });
+                return await RpcRequestAsync<AccountInfoResponse>(new
+                {
+                    Action = "account_info",
+                    Account = address,
+                    Representative = representative
+                });
+            }
+            catch (RpcException exception)
+            {
+                if (exception.OriginalError == "Account not found")
+                    throw new UnopenedAccountException();
+                else
+                    throw;
+            }
         }
         
         /// <summary>WARNING: This command is usually disabled on public nodes. You need to use your own node.</summary>
