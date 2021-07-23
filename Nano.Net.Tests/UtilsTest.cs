@@ -55,5 +55,12 @@ namespace Nano.Net.Tests
                 BytesToHex(PublicKeyFromAddress(FirstAddress)),
                 true);
         }
+
+        [Fact]
+        public void IsAddressValidTest()
+        {
+            Assert.False(IsAddressValid("nano_1aaaasfed6j3ihjxs5ohrk9j56smyxoj4wirc5ja4ru5spqfkpue1xnxc1hk"));
+            Assert.True(IsAddressValid("nano_1aq4tsfed6j3ihjxs5ohrk9j56smyxoj4wirc5ja4ru5spqfkpue1xnxc1hk"));
+        }
     }
 }

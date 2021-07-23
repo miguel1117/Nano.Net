@@ -3,13 +3,13 @@ A .NET library for [Nano](https://nano.org).
 Still in development. Please feel free to submit any changes, bugfixes or new features with pull requests.
 
 
-## Features
+## Features/Roadmap
 * [x] Seed generation and derivation
 * [x] Keypair and address generation
 * [x] Local block signing
 * [x] RPC client for interacting with the network
+* [ ] Improve documentation
 * [ ] Unit conversion
-* [ ] Local work generation
 
 
 ## Acknowledgements

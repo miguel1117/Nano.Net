@@ -132,18 +132,18 @@ namespace Nano.Net
             return publicKey;
         }
 
-        private static byte[] AddressChecksum(byte[] publicKey)
+        private static string EncodedAddressChecksum(byte[] publicKey)
         {
             byte[] final = Blake2BHash(5, publicKey);
 
-            return final.Reverse().ToArray();
+            return EncodeNanoBase32(final.Reverse().ToArray(), false);
         }
 
         public static string AddressFromPublicKey(byte[] publicKey)
         {
             var address = "nano_";
             address += EncodeNanoBase32(publicKey);
-            address += EncodeNanoBase32(AddressChecksum(publicKey), false);
+            address += EncodedAddressChecksum(publicKey);
 
             return address;
         }
@@ -151,6 +151,13 @@ namespace Nano.Net
         public static byte[] PublicKeyFromAddress(string address)
         {
             return DecodeNanoBase32(address);
+        }
+
+        public static bool IsAddressValid(string address)
+        {
+            byte[] publicKey = PublicKeyFromAddress(address);
+
+            return EncodedAddressChecksum(publicKey) == address[^8..];
         }
     }
 }
