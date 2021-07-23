@@ -106,10 +106,10 @@ namespace Nano.Net
 
         public void Sign(byte[] privateKey)
         {
-            Ed25519.KeyPairFromSeed(out byte[] publicKey, out byte[] expandedPrivateKey, privateKey);
-
-            if (!PublicKeyFromPrivateKey(privateKey).SequenceEqual(PublicKeyFromAddress(Account)))
+            if (!PublicKeyFromPrivateKey(privateKey).SequenceEqual(PublicKeyFromAddress(Account))) // check if the provided private key matches this block's account
                 throw new Exception("The private key doesn't match this block's account");
+            
+            Ed25519.KeyPairFromSeed(out byte[] _, out byte[] expandedPrivateKey, privateKey);
 
             byte[] signatureBytes = Ed25519.Sign(HexToBytes(Hash), expandedPrivateKey);
 
