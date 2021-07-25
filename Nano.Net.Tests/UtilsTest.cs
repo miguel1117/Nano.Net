@@ -1,4 +1,5 @@
-﻿using Xunit;
+﻿using System;
+using Xunit;
 using static Nano.Net.Utils;
 
 namespace Nano.Net.Tests
@@ -14,14 +15,14 @@ namespace Nano.Net.Tests
         public void HexToBytesTest()
         {
             HexToBytes("ABCD");
-            Assert.Throws<InvalidHexStringException>(() => HexToBytes("ABCDE")); // invalid hex string size, must be a multiple of 2
-            Assert.Throws<InvalidHexStringException>(() => HexToBytes("ABCK")); // invalid hex characters
+            Assert.Throws<ArgumentException>(() => HexToBytes("ABCDE")); // invalid hex string size, must be a multiple of 2
+            Assert.Throws<ArgumentException>(() => HexToBytes("ABCK")); // invalid hex characters
         }
         
         [Fact]
         public void DerivePrivateKeyTest()
         {
-            Assert.Throws<InvalidSeedException>(() => DerivePrivateKey(string.Empty, 0));
+            Assert.Throws<ArgumentException>(() => DerivePrivateKey(string.Empty, 0));
 
             Assert.Equal("A066701E0641E524662E3B7F67F98A248C300017BAA8AA0D91A95A2BCAF8D4D8",
                 BytesToHex(DerivePrivateKey(Seed, 0)),
@@ -59,7 +60,9 @@ namespace Nano.Net.Tests
         [Fact]
         public void IsAddressValidTest()
         {
+            Assert.False(IsAddressValid("nano_1fed6j3ihjxs5ohrk9j56smyxoj4wirc5ja4ru5spqfkpue1xnxc1hk"));
             Assert.False(IsAddressValid("nano_1aaaasfed6j3ihjxs5ohrk9j56smyxoj4wirc5ja4ru5spqfkpue1xnxc1hk"));
+            Assert.False(IsAddressValid("nan_1aq4tsfed6j3ihjxs5ohrk9j56smyxoj4wirc5ja4ru5spqfkpue1xnxc1hk"));
             Assert.True(IsAddressValid("nano_1aq4tsfed6j3ihjxs5ohrk9j56smyxoj4wirc5ja4ru5spqfkpue1xnxc1hk"));
         }
     }

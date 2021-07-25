@@ -32,10 +32,10 @@ namespace Nano.Net
         public static byte[] HexToBytes(string hex)
         {
             if (hex.Length % 2 != 0)
-                throw new InvalidHexStringException("Hex string length isn't valid.");
-            
+                throw new ArgumentException("Hex string length isn't valid.");
+
             if (!Regex.IsMatch(hex, @"^[0-9A-F]+$"))
-                throw new InvalidHexStringException("Invalid hex characters.");
+                throw new ArgumentException("Invalid hex characters.");
 
             return Enumerable.Range(0, hex.Length)
                 .Where(x => x % 2 == 0)
@@ -82,7 +82,7 @@ namespace Nano.Net
             int prefixIndex = data.IndexOf("_", StringComparison.Ordinal);
 
             if (prefixIndex == -1)
-                throw new FormatException("Invalid Nano address");
+                throw new ArgumentException("This Nano address isn't valid.");
 
             data = data.Substring(prefixIndex + 1, 52);
 
@@ -115,7 +115,7 @@ namespace Nano.Net
         public static byte[] DerivePrivateKey(string seed, uint index)
         {
             if (seed.Length != 64)
-                throw new InvalidSeedException("A Nano seed should consist of 64 hex characters.");
+                throw new ArgumentException("A Nano seed should consist of 64 hex characters.");
 
             byte[] indexBytes = BitConverter.GetBytes(index);
             if (BitConverter.IsLittleEndian)
@@ -128,6 +128,9 @@ namespace Nano.Net
 
         public static byte[] PublicKeyFromPrivateKey(byte[] privateKey)
         {
+            if (privateKey.Length != 32)
+                throw new ArgumentException("A private key must be exactly 32 bytes.");
+            
             Ed25519.KeyPairFromSeed(out byte[] publicKey, out byte[] _, privateKey);
             return publicKey;
         }
@@ -141,6 +144,9 @@ namespace Nano.Net
 
         public static string AddressFromPublicKey(byte[] publicKey)
         {
+            if (publicKey.Length != 32)
+                throw new ArgumentException("A public key must be exactly 32 bytes.");
+            
             var address = "nano_";
             address += EncodeNanoBase32(publicKey);
             address += EncodedAddressChecksum(publicKey);
@@ -150,12 +156,18 @@ namespace Nano.Net
 
         public static byte[] PublicKeyFromAddress(string address)
         {
-            return DecodeNanoBase32(address);
+            if (IsAddressValid(address))
+                return DecodeNanoBase32(address);
+            else
+                throw new ArgumentException("This Nano address isn't valid.");
         }
 
         public static bool IsAddressValid(string address)
         {
-            byte[] publicKey = PublicKeyFromAddress(address);
+            if (!Regex.IsMatch(address, @"^(nano|xrb)_[13]{1}[13456789abcdefghijkmnopqrstuwxyz]{59}$"))
+                return false;
+
+            byte[] publicKey = DecodeNanoBase32(address);
 
             return EncodedAddressChecksum(publicKey) == address[^8..];
         }
