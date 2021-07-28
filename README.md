@@ -45,7 +45,10 @@ string address = Utils.AddressFromPublicKey(publicKey);
 publicKey = Utils.PublicKeyFromAddress(address);
 ```
 
-**Sending and receiving  a transaction**
+**Sending and receiving  a transaction**  
+* Important: Make sure the account balance is up to date before sending a transaction,
+  or you could end up sending more than you wanted.
+  For more information [check this warning from the official docs](https://docs.nano.org/integration-guides/key-management/?h=bip#:~:text=Warning,account_info%20RPC%20call.).
 ```c#
 var rpcClient = new RpcClient("NODE_ADDRESS");
 Account account = Account.FromPrivateKey("A066701E0641E524662E3B7F67F98A248C300017BAA8AA0D91A95A2BCAF8D4D8");
@@ -58,11 +61,13 @@ var sendBlock = Block.CreateSendBlock(account,
     "nano_3tjhazni9juaoa8q9rw33nf3f6i45gswhpzrgrbrawxhh7a777ror9okstch",
     Amount.FromRaw("1"), 
     "POW_NONCE");
-
-var receiveBlock = Block.CreateReceiveBlock(account, "PENDING_BLOCK_HASH", Amount.FromRaw("1"), "POW_NONCE"); // You can also get pending blocks for an account using the rpc client and use a PendingBlock object as an argument.
             
 // Publish the block to the network.
 await rpcClient.ProcessAsync(sendBlock);
+
+// Receive a transaction
+var receiveBlock = Block.CreateReceiveBlock(account, "PENDING_BLOCK_HASH", Amount.FromRaw("1"), "POW_NONCE"); // You can also get pending blocks for an account using the rpc client and use a PendingBlock object as an argument.
+
 await rpcClient.ProcessAsync(receiveBlock);
 ```
 
