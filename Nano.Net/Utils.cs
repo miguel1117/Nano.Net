@@ -13,16 +13,16 @@ namespace Nano.Net
     {
         private static readonly Dictionary<char, string> NanoAddressEncoding;
         private static readonly Dictionary<string, char> NanoAddressDecoding;
-        private const string NanoAlphabet = "13456789abcdefghijkmnopqrstuwxyz";
 
         static Utils()
         {
+            const string nanoAlphabet = "13456789abcdefghijkmnopqrstuwxyz";
             NanoAddressEncoding = new Dictionary<char, string>();
             NanoAddressDecoding = new Dictionary<string, char>();
 
-            for (var i = 0; i < NanoAlphabet.Length; i++)
+            for (var i = 0; i < nanoAlphabet.Length; i++)
             {
-                char c = NanoAlphabet[i];
+                char c = nanoAlphabet[i];
 
                 NanoAddressEncoding[c] = Convert.ToString(i, 2).PadLeft(5, '0');
                 NanoAddressDecoding[Convert.ToString(i, 2).PadLeft(5, '0')] = c;
@@ -130,7 +130,7 @@ namespace Nano.Net
         {
             if (privateKey.Length != 32)
                 throw new ArgumentException("A private key must be exactly 32 bytes.");
-            
+
             Ed25519.KeyPairFromSeed(out byte[] publicKey, out byte[] _, privateKey);
             return publicKey;
         }
@@ -146,7 +146,7 @@ namespace Nano.Net
         {
             if (publicKey.Length != 32)
                 throw new ArgumentException("A public key must be exactly 32 bytes.");
-            
+
             var address = "nano_";
             address += EncodeNanoBase32(publicKey);
             address += EncodedAddressChecksum(publicKey);
