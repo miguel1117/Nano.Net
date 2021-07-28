@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace Nano.Net.Response
+namespace Nano.Net
 {
     public class AccountInfoResponse
     {

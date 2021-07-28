@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Newtonsoft.Json;
 
-namespace Nano.Net.Response
+namespace Nano.Net
 {
     public class PendingBlocksResponse
     {

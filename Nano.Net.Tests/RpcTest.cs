@@ -1,5 +1,4 @@
 using System;
-using Nano.Net.Response;
 using Xunit;
 
 namespace Nano.Net.Tests

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using Chaos.NaCl;
-using Nano.Net.Response;
 using Newtonsoft.Json;
 using static Nano.Net.Utils;
 
