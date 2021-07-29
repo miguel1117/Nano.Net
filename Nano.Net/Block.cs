@@ -14,13 +14,14 @@ namespace Nano.Net
     public class Block : BlockBase
     {
         [JsonIgnore] public string Hash => GetHash();
-        
-        private const string MissingInformationError = "Not all properties for this account have been set. Please update this account's properties manually or use the RpcClient UpdateAccountAsync method.";
+
+        private const string MissingInformationError =
+            "Not all properties for this account have been set. Please update this account's properties manually or use the RpcClient UpdateAccountAsync method.";
 
         /// <summary>
-        /// Create a send block and sign it. Requires the account object to have all the properties correctly set.
+        /// Create a send block and sign it. Requires the sending Account object to have all the properties correctly set.
         /// </summary>
-        /// <param name="sender">The account that will send the funds.</param>
+        /// <param name="sender">The Account that will send the funds.</param>
         /// <param name="receiver">The address that will be receiving the funds.</param>
         /// <param name="amount">The amount of Nano being sent.</param>
         /// <param name="powNonce">The PoW nonce generated from the frontier block hash for this account.</param>
@@ -51,6 +52,14 @@ namespace Nano.Net
             return block;
         }
 
+        /// <summary>
+        /// Create a send block and sign it. Requires the receiving Account object to have all the properties correctly set.
+        /// </summary>
+        /// <param name="receiver">The Account that will receive the funds.</param>
+        /// <param name="blockHash">The receivable block hash.</param>
+        /// <param name="amount">The Amount of the receivable block.</param>
+        /// <param name="powNonce">The PoW nonce that is required for publishing blocks.</param>
+        /// <returns>A signed Block object.</returns>
         public static Block CreateReceiveBlock(Account receiver, string blockHash, Amount amount, string powNonce)
         {
             if (receiver.MissingInformation)
@@ -72,6 +81,11 @@ namespace Nano.Net
             return block;
         }
 
+        /// <summary><inheritdoc cref="CreateReceiveBlock(Account, string, Amount, string)"/></summary>
+        /// <param name="receiver"><inheritdoc cref="CreateReceiveBlock(Account, string, Amount, string)"/></param>
+        /// <param name="pendingBlock">The receivable block to be received.</param>
+        /// <param name="powNonce"><inheritdoc cref="CreateReceiveBlock(Account, string, Amount, string)"/></param>
+        /// <returns><inheritdoc cref="CreateReceiveBlock(Account, string, Amount, string)"/></returns>
         public static Block CreateReceiveBlock(Account receiver, PendingBlock pendingBlock, string powNonce)
         {
             return CreateReceiveBlock(receiver, pendingBlock.Hash, Amount.FromRaw(pendingBlock.Amount), powNonce);
@@ -105,12 +119,18 @@ namespace Nano.Net
 
             return BytesToHex(final);
         }
-
+        
+        /// <summary>
+        /// Sign this block using the provided private key and set its Signature property
+        /// </summary>
+        /// <param name="privateKey">The private key for this block's account.</param>
+        /// <exception cref="Exception">The provided private key doesn't match the public key for this block.</exception>
         public void Sign(byte[] privateKey)
         {
-            if (!PublicKeyFromPrivateKey(privateKey).SequenceEqual(PublicKeyFromAddress(Account))) // check if the provided private key matches this block's account
+            if (!PublicKeyFromPrivateKey(privateKey)
+                .SequenceEqual(PublicKeyFromAddress(Account))) // check if the provided private key matches this block's account
                 throw new Exception("The private key doesn't match this block's account");
-            
+
             Ed25519.KeyPairFromSeed(out byte[] _, out byte[] expandedPrivateKey, privateKey);
 
             byte[] signatureBytes = Ed25519.Sign(HexToBytes(Hash), expandedPrivateKey);
