@@ -76,3 +76,7 @@ await rpcClient.ProcessAsync(receiveBlock);
 * [NanoDotNet](https://github.com/Flufd/NanoDotNet) for bits of code, including the Nano base32 implementation
 * [Chaos.NaCl](https://github.com/CodesInChaos/Chaos.NaCl) for the original C# implementation of ED25519 signing and keypair generation
 * [BLAKE2](https://github.com/BLAKE2/BLAKE2) for the C# implementation of Blake2B
+
+## Donations
+This library is 100% free, but donations are accepted at the address below. Any amount is appreciated.
+`nano_168owitqjg7nhg1jqcqf9q4uqgtmcp5h9xtydh6ybz7zqa9mp197draz4azs`

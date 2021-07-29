@@ -2,7 +2,7 @@
 
 namespace Nano.Net
 {
-    public class PendingBlock
+    public class ReceivableBlock
     {
         [JsonProperty("hash")] public string Hash { get; set; }
         [JsonProperty("amount")] public string Amount { get; set; }

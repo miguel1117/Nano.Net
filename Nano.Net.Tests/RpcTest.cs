@@ -33,8 +33,8 @@ namespace Nano.Net.Tests
         [Fact]
         public async void PendingBlockTest()
         {
-            PendingBlocksResponse pendingBlocks = await _rpcClient.PendingBlocksAsync(Constants.ReferenceAccount);
-            Assert.NotEmpty(pendingBlocks.PendingBlocks);
+            ReceivableBlocksResponse receivableBlocks = await _rpcClient.PendingBlocksAsync(Constants.ReferenceAccount);
+            Assert.NotEmpty(receivableBlocks.PendingBlocks);
         }
 
         [Fact]

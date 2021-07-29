@@ -83,12 +83,12 @@ namespace Nano.Net
 
         /// <summary><inheritdoc cref="CreateReceiveBlock(Account, string, Amount, string)"/></summary>
         /// <param name="receiver"><inheritdoc cref="CreateReceiveBlock(Account, string, Amount, string)"/></param>
-        /// <param name="pendingBlock">The receivable block to be received.</param>
+        /// <param name="receivableBlock">The receivable block to be received.</param>
         /// <param name="powNonce"><inheritdoc cref="CreateReceiveBlock(Account, string, Amount, string)"/></param>
         /// <returns><inheritdoc cref="CreateReceiveBlock(Account, string, Amount, string)"/></returns>
-        public static Block CreateReceiveBlock(Account receiver, PendingBlock pendingBlock, string powNonce)
+        public static Block CreateReceiveBlock(Account receiver, ReceivableBlock receivableBlock, string powNonce)
         {
-            return CreateReceiveBlock(receiver, pendingBlock.Hash, Amount.FromRaw(pendingBlock.Amount), powNonce);
+            return CreateReceiveBlock(receiver, receivableBlock.Hash, Amount.FromRaw(receivableBlock.Amount), powNonce);
         }
 
         public string GetHash()

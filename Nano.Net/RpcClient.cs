@@ -78,9 +78,9 @@ namespace Nano.Net
             });
         }
 
-        public async Task<PendingBlocksResponse> PendingBlocksAsync(string address, int count = 5)
+        public async Task<ReceivableBlocksResponse> PendingBlocksAsync(string address, int count = 5)
         {
-            var pendingBlocks = await RpcRequestAsync<PendingBlocksResponse>(new
+            var pendingBlocks = await RpcRequestAsync<ReceivableBlocksResponse>(new
             {
                 Action = "pending",
                 Account = address,
@@ -89,7 +89,7 @@ namespace Nano.Net
                 IncludeOnlyConfirmed = true
             });
 
-            foreach ((string key, PendingBlock value) in pendingBlocks.PendingBlocks)
+            foreach ((string key, ReceivableBlock value) in pendingBlocks.PendingBlocks)
                 value.Hash = key;
 
             return pendingBlocks;
