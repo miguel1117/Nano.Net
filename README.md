@@ -7,9 +7,9 @@ Still in development. Please feel free to submit any changes, bugfixes or new fe
 * [x] Seed generation and derivation
 * [x] Keypair and address generation
 * [x] Local block signing
+* [x] Unit conversion
 * [x] RPC client for interacting with the network
 * [ ] Improve documentation
-* [ ] Unit conversion
 
 
 ## Usage
