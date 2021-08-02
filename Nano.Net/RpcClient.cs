@@ -2,7 +2,6 @@
 
 
 using System;
-using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
@@ -26,9 +25,21 @@ namespace Nano.Net
             }
         };
 
-        public RpcClient(string nodeAddress)
+        /// <summary>
+        /// Initialize rpc to a local node with default settings
+        /// </summary>
+        public RpcClient()
         {
-            NodeAddress = nodeAddress;
+            NodeAddress = "http://localhost:7076";
+        }
+
+        /// <summary>
+        /// Initialize rpc with a specific uri.
+        /// </summary>
+        /// <param name="nodeUri">Example: Http://192.168.0.1:7076</param>
+        public RpcClient(string nodeUri)
+        {
+            NodeAddress = nodeUri;
         }
 
         private async Task<T> RpcRequestAsync<T>(object request)
@@ -47,7 +58,12 @@ namespace Nano.Net
         }
 
         // Default node RPC calls
-
+        /// <summary>
+        /// Get information about a Nano account
+        /// </summary>
+        /// <param name="address"></param>
+        /// <param name="representative"></param>
+        /// <returns></returns>
         public async Task<AccountInfoResponse> AccountInfoAsync(string address, bool representative = true)
         {
             try

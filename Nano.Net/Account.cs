@@ -21,11 +21,22 @@ namespace Nano.Net
         {
         }
 
+        /// <summary>
+        /// Create account from seed
+        /// </summary>
+        /// <param name="seed"></param>
+        /// <param name="index"></param>
+        /// <returns></returns>
         public static Account FromSeed(string seed, uint index)
         {
             return FromPrivateKey(DerivePrivateKey(seed, index));
         }
 
+        /// <summary>
+        /// Create account from private key
+        /// </summary>
+        /// <param name="privateKey"></param>
+        /// <returns></returns>
         public static Account FromPrivateKey(byte[] privateKey)
         {
             byte[] publicKey = PublicKeyFromPrivateKey(privateKey);
@@ -39,6 +50,11 @@ namespace Nano.Net
             };
         }
 
+        /// <summary>
+        /// Create account from private key
+        /// </summary>
+        /// <param name="privateKey"></param>
+        /// <returns></returns>
         public static Account FromPrivateKey(string privateKey)
         {
             return FromPrivateKey(HexToBytes(privateKey));
