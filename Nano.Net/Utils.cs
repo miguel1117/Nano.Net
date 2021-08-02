@@ -173,5 +173,19 @@ namespace Nano.Net
 
             return EncodedAddressChecksum(publicKey) == address[^8..];
         }
+        
+        public static bool IsWorkValid(string hash, string powNonce, string threshold = null)
+        {
+            byte[] thresholdBytes = threshold is null ? HexToBytes("fffffff800000000") : HexToBytes(threshold);
+            ulong thresholdValue = BitConverter.ToUInt64(thresholdBytes.Reverse().ToArray());
+
+            byte[] hashBytes = HexToBytes(hash);
+            byte[] workBytes = HexToBytes(powNonce).Reverse().ToArray();
+
+            byte[] output = Blake2BHash(8, workBytes, hashBytes);
+            ulong outputValue = BitConverter.ToUInt64(output);
+            
+            return outputValue > thresholdValue;
+        }
     }
 }

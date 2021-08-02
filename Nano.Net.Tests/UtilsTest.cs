@@ -65,5 +65,14 @@ namespace Nano.Net.Tests
             Assert.False(IsAddressValid("nan_1aq4tsfed6j3ihjxs5ohrk9j56smyxoj4wirc5ja4ru5spqfkpue1xnxc1hk"));
             Assert.True(IsAddressValid("nano_1aq4tsfed6j3ihjxs5ohrk9j56smyxoj4wirc5ja4ru5spqfkpue1xnxc1hk"));
         }
+
+        [Fact]
+        public void ValidateWorkTest()
+        {
+            Assert.True(IsWorkValid("4E5004CA14899B8F9AABA7A76D010F73E6BAE54948912588B8C4FE0A3B558CA5", "ae51f0fe1604558c"));
+            Assert.True(IsWorkValid("E1D6E04A3BC2C00A6E7F282ACC84C622E1A4C9B8BDBB087E73496CF8999E5494", "3de4af5abb7e4931"));
+            Assert.False(IsWorkValid("4E5004CA14899B8F9AABA7A76D010F73E6BAE54948912588B8C4FE0A3B558CA5", "ae51f0fe1604558b"));
+            Assert.False(IsWorkValid("E1D6E04A3BC2C00A6E7F282ACC84C622E1A4C9B8BDBB087E73496CF8999E5494", "3de4af5abb7e4930"));
+        }
     }
 }
