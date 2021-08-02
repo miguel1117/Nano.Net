@@ -88,31 +88,24 @@ namespace Nano.Net
             return CreateReceiveBlock(receiver, receivableBlock.Hash, Amount.FromRaw(receivableBlock.Amount), powNonce);
         }
 
-        public string GetHash()
+        private string GetHash()
         {
-            var bytes = new List<byte>();
-
             var type = new byte[32];
             type[31] = 0x6;
-            bytes.AddRange(type);
-
-            byte[] account = PublicKeyFromAddress(Account);
-            bytes.AddRange(account);
-
-            byte[] previous = HexToBytes(Previous);
-            bytes.AddRange(previous);
-
-            byte[] representative = PublicKeyFromAddress(Representative);
-            bytes.AddRange(representative);
 
             byte[] balanceBytes = BigInteger.Parse(Balance).ToByteArray(true, true);
-            bytes.AddRange(new byte[16 - balanceBytes.Length]); // pad balance
-            bytes.AddRange(balanceBytes);
 
-            byte[] link = Subtype == BlockSubtype.Send ? PublicKeyFromAddress(Link) : HexToBytes(Link);
-            bytes.AddRange(link);
-
-            byte[] final = Blake2BHash(32, bytes.ToArray());
+            byte[] final = Blake2BHash
+            (
+                32,
+                type,
+                PublicKeyFromAddress(Account),
+                HexToBytes(Previous),
+                PublicKeyFromAddress(Representative),
+                new byte[16 - balanceBytes.Length],
+                balanceBytes,
+                Subtype == BlockSubtype.Send ? PublicKeyFromAddress(Link) : HexToBytes(Link)
+            );
 
             return BytesToHex(final);
         }
