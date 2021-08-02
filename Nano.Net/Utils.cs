@@ -34,7 +34,7 @@ namespace Nano.Net
             if (hex.Length % 2 != 0)
                 throw new ArgumentException("Hex string length isn't valid.");
 
-            if (!Regex.IsMatch(hex, @"^[0-9A-F]+$"))
+            if (!Regex.IsMatch(hex, @"^(?i)[0-9A-F]+$"))
                 throw new ArgumentException("Invalid hex characters.");
 
             return Enumerable.Range(0, hex.Length)

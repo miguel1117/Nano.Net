@@ -14,7 +14,7 @@ namespace Nano.Net.Tests
         [Fact]
         public void HexToBytesTest()
         {
-            HexToBytes("ABCD");
+            HexToBytes("ABcd");
             Assert.Throws<ArgumentException>(() => HexToBytes("ABCDE")); // invalid hex string size, must be a multiple of 2
             Assert.Throws<ArgumentException>(() => HexToBytes("ABCK")); // invalid hex characters
         }
