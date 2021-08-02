@@ -5,12 +5,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <ProjectReference Include="..\Blake2Sharp\Blake2Sharp.csproj" />
-      <ProjectReference Include="..\Chaos.NaCl.Blake2\Chaos.NaCl.Blake2.csproj" />
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.1"/>
     </ItemGroup>
 
 </Project>

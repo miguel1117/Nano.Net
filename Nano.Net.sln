@@ -4,10 +4,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nano.Net", "Nano.Net\Nano.N
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nano.Net.Tests", "Nano.Net.Tests\Nano.Net.Tests.csproj", "{BFA134FE-6E02-4629-AD8C-4198E018438C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chaos.NaCl.Blake2", "Chaos.NaCl.Blake2\Chaos.NaCl.Blake2.csproj", "{771C8973-5C13-405B-827A-90F6A76DCF1C}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Blake2Sharp", "Blake2Sharp\Blake2Sharp.csproj", "{2532B742-D35F-4944-95AC-FA0AF5EBA0E7}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -22,13 +18,5 @@ Global
 		{BFA134FE-6E02-4629-AD8C-4198E018438C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BFA134FE-6E02-4629-AD8C-4198E018438C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BFA134FE-6E02-4629-AD8C-4198E018438C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{771C8973-5C13-405B-827A-90F6A76DCF1C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{771C8973-5C13-405B-827A-90F6A76DCF1C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{771C8973-5C13-405B-827A-90F6A76DCF1C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{771C8973-5C13-405B-827A-90F6A76DCF1C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{2532B742-D35F-4944-95AC-FA0AF5EBA0E7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2532B742-D35F-4944-95AC-FA0AF5EBA0E7}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2532B742-D35F-4944-95AC-FA0AF5EBA0E7}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2532B742-D35F-4944-95AC-FA0AF5EBA0E7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
