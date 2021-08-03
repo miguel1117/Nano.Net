@@ -12,6 +12,12 @@ Still in development. Please feel free to submit any changes, bugfixes or new fe
 * [ ] Improve documentation
 
 
+## Installation
+You can either:
+* Download the package [from Nuget](https://www.nuget.org/packages/Nano.Net/)
+* Clone the repository, build the source and copy the DLL to your project
+
+
 ## Usage
 **Using the RPC client**
 ```c#

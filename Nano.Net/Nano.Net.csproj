@@ -2,10 +2,17 @@
 
     <PropertyGroup>
         <TargetFramework>net5.0</TargetFramework>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <Title>Nano.Net</Title>
+        <Description>A .NET library for the Nano cryptocurrency</Description>
+        <Copyright>miguel1117</Copyright>
+        <PackageProjectUrl>https://github.com/miguel1117/Nano.Net</PackageProjectUrl>
+        <PackageLicenseUrl>https://github.com/miguel1117/Nano.Net/blob/master/LICENSE</PackageLicenseUrl>
+        <RepositoryUrl>https://github.com/miguel1117/Nano.Net</RepositoryUrl>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Newtonsoft.Json" Version="13.0.1"/>
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     </ItemGroup>
 
 </Project>
