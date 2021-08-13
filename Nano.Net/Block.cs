@@ -89,19 +89,17 @@ namespace Nano.Net
 
         private string GetHash()
         {
-            var type = new byte[32];
-            type[31] = 0x6;
-
             byte[] balanceBytes = BigInteger.Parse(Balance).ToByteArray(true, true);
 
             byte[] final = Blake2BHash
             (
                 32,
-                type,
+                new byte[31],
+                new byte[] { 0x6 },
                 PublicKeyFromAddress(Account),
                 HexToBytes(Previous),
                 PublicKeyFromAddress(Representative),
-                new byte[16 - balanceBytes.Length],
+                new byte[16 - balanceBytes.Length], // pad balance to ensure it is 16 bytes in total
                 balanceBytes,
                 Subtype == BlockSubtype.Send ? PublicKeyFromAddress(Link) : HexToBytes(Link)
             );

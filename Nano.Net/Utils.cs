@@ -174,6 +174,7 @@ namespace Nano.Net
             return EncodedAddressChecksum(publicKey) == address[^8..];
         }
         
+        // this could probably be made more efficient and it also needs more testing
         public static bool IsWorkValid(string hash, string powNonce, string threshold = null)
         {
             byte[] thresholdBytes = threshold is null ? HexToBytes("fffffff800000000") : HexToBytes(threshold);
