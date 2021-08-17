@@ -9,13 +9,13 @@ Still in development. Please feel free to submit any changes, bugfixes or new fe
 * [x] Local block signing
 * [x] Unit conversion
 * [x] RPC client for interacting with the network
-* [ ] Improve documentation
+* [ ] Good documentation
 
 
 ## Installation
 You can either:
-* Download the package [from Nuget](https://www.nuget.org/packages/Nano.Net/)
-* Clone the repository, build the source and copy the DLL to your project
+* Install the package [from Nuget](https://www.nuget.org/packages/Nano.Net/)
+* Build the project and copy the binaries to your project
 
 
 ## Usage
@@ -62,7 +62,7 @@ Account account = Account.FromPrivateKey("A066701E0641E524662E3B7F67F98A248C3000
 // Sets the balance, representative and frontier for this account from a node. Can also be set manually.
 await rpcClient.UpdateAccountAsync(account);
             
-// Creates a block and automatically sign it. The PoW nonce has to be obtained externally. Unit conversion isn't implemented yet.
+// Creates a block and automatically sign it. The PoW nonce has to be obtained externally.
 var sendBlock = Block.CreateSendBlock(account,
     "nano_3tjhazni9juaoa8q9rw33nf3f6i45gswhpzrgrbrawxhh7a777ror9okstch",
     Amount.FromRaw("1"), 

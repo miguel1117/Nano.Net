@@ -26,7 +26,7 @@ namespace Nano.Net
         };
 
         /// <summary>
-        /// Initialize rpc to a local node with default settings
+        /// Create a new RpcClient connected to a local node.
         /// </summary>
         public RpcClient()
         {
@@ -57,13 +57,11 @@ namespace Nano.Net
             return JsonConvert.DeserializeObject<T>(json);
         }
 
-        // Default node RPC calls
+        // Raw node RPC calls
+        
         /// <summary>
-        /// Get information about a Nano account
+        /// Get information about a Nano account.
         /// </summary>
-        /// <param name="address"></param>
-        /// <param name="representative"></param>
-        /// <returns></returns>
         public async Task<AccountInfoResponse> AccountInfoAsync(string address, bool representative = true)
         {
             try
@@ -83,8 +81,13 @@ namespace Nano.Net
                     throw;
             }
         }
-
-        /// <summary>WARNING: This command is usually disabled on public nodes. You need to use your own node.</summary>
+        
+        /// <summary>
+        /// Generate a work nonce for a hash using the node.
+        /// </summary>
+        /// <remarks>
+        /// WARNING: This command is usually disabled on public nodes. You need to use your own node.
+        /// </remarks>
         public async Task<WorkGenerateResponse> WorkGenerateAsync(string hash)
         {
             return await RpcRequestAsync<WorkGenerateResponse>(new
@@ -93,7 +96,10 @@ namespace Nano.Net
                 Hash = hash
             });
         }
-
+        
+        /// <summary>
+        /// Gets the pending/receivable blocks for an account.
+        /// </summary>
         public async Task<ReceivableBlocksResponse> PendingBlocksAsync(string address, int count = 5)
         {
             var pendingBlocks = await RpcRequestAsync<ReceivableBlocksResponse>(new
@@ -110,7 +116,11 @@ namespace Nano.Net
 
             return pendingBlocks;
         }
-
+        
+        /// <summary>
+        /// Publishes a Block to the network.
+        /// </summary>
+        /// <exception cref="Exception">If the block signature or work nonce hasn't been set.</exception>
         public async Task<ProcessResponse> ProcessAsync(Block block)
         {
             if (block.Signature is null)
@@ -129,7 +139,10 @@ namespace Nano.Net
         }
 
         // Custom calls
-
+        
+        /// <summary>
+        /// Update an Account object's properties with relevant information from the network.
+        /// </summary>
         public async Task UpdateAccountAsync(Account account)
         {
             AccountInfoResponse accountInfo;
