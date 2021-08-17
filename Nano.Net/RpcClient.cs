@@ -124,10 +124,10 @@ namespace Nano.Net
         public async Task<ProcessResponse> ProcessAsync(Block block)
         {
             if (block.Signature is null)
-                throw new Exception("This block hasn't been signed yet.");
+                throw new IncompleteBlockException("This block hasn't been signed yet.");
 
             if (block.Work is null)
-                throw new Exception("The PoW nonce for this block hasn't been set.");
+                throw new IncompleteBlockException("The PoW nonce for this block hasn't been set.");
 
             return await RpcRequestAsync<ProcessResponse>(new
             {

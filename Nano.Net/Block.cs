@@ -30,7 +30,7 @@ namespace Nano.Net
                 throw new AccountMissingInformationException();
 
             if (amount.Raw > sender.Balance.Raw)
-                throw new Exception("Insufficient balance.");
+                throw new InsufficientBalanceException($"Insufficient balance. Balance: {sender.Balance.Nano}; transaction amount: {amount.Nano}");
 
             var block = new Block()
             {
