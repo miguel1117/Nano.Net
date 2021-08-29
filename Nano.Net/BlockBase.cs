@@ -2,7 +2,7 @@
 
 namespace Nano.Net
 {
-    public abstract class BlockBase
+    public class BlockBase
     {
         [JsonProperty("type")] public string Type => "state";
         [JsonProperty("account")] public string Account { get; init; }
@@ -13,7 +13,5 @@ namespace Nano.Net
         
         [JsonProperty("signature")] public string Signature { get; set; }
         [JsonProperty("work")] public string Work { get; set; }
-        
-        [JsonIgnore] public string Subtype { get; init; }
     }
 }
