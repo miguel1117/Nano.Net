@@ -11,11 +11,20 @@ Still in development. Please feel free to submit any changes, bugfixes or new fe
 * [x] RPC client for interacting with the network
 * [ ] Good documentation
 
+## Requirements
+* .NET 5.0 or .NET Core 3.1
+* C# 9
 
 ## Installation
 You can either:
 * Install the package [from Nuget](https://www.nuget.org/packages/Nano.Net/)
 * Build the project and copy the binaries to your project
+* If your project targets .NET Core then the C# version should be set to version 9 in the .csproj file. Example: 
+```xml
+<PropertyGroup>
+	<LangVersion>9.0</LangVersion>
+</PropertyGroup>
+```
 
 
 ## Usage
