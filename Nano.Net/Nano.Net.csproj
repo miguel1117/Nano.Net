@@ -1,7 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net5.0</TargetFramework>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <Title>Nano.Net</Title>
         <Description>A .NET library for the Nano cryptocurrency</Description>
@@ -9,10 +8,15 @@
         <PackageProjectUrl>https://github.com/miguel1117/Nano.Net</PackageProjectUrl>
         <PackageLicenseUrl>https://github.com/miguel1117/Nano.Net/blob/master/LICENSE</PackageLicenseUrl>
         <RepositoryUrl>https://github.com/miguel1117/Nano.Net</RepositoryUrl>
+        <TargetFrameworks>net5.0;netcoreapp3.1</TargetFrameworks>
     </PropertyGroup>
 
     <ItemGroup>
         <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     </ItemGroup>
+
+    <PropertyGroup>
+        <LangVersion>9</LangVersion>
+    </PropertyGroup>
 
 </Project>
