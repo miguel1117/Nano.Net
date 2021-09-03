@@ -120,8 +120,9 @@ namespace Nano.Net
                 IncludeOnlyConfirmed = true
             });
 
-            foreach ((string key, ReceivableBlock value) in pendingBlocks.PendingBlocks)
-                value.Hash = key;
+            if (pendingBlocks?.PendingBlocks != null)
+                foreach ((string key, ReceivableBlock value) in pendingBlocks?.PendingBlocks)
+                    value.Hash = key;
 
             return pendingBlocks;
         }
