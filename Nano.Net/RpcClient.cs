@@ -88,8 +88,17 @@ namespace Nano.Net
         /// <remarks>
         /// WARNING: This command is usually disabled on public nodes. You need to use your own node.
         /// </remarks>
-        public async Task<WorkGenerateResponse> WorkGenerateAsync(string hash)
+        public async Task<WorkGenerateResponse> WorkGenerateAsync(string hash, string difficulty = "")
         {
+            if (!string.IsNullOrEmpty(difficulty))
+            {
+                return await RpcRequestAsync<WorkGenerateResponse>(new
+                {
+                    Action = "work_generate",
+                    Hash = hash,
+                    Difficulty = difficulty
+                });
+            }
             return await RpcRequestAsync<WorkGenerateResponse>(new
             {
                 Action = "work_generate",
