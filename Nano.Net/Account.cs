@@ -53,7 +53,7 @@ namespace Nano.Net
         /// </summary>
         public static Account FromPrivateKey(string privateKey, string prefix = "nano")
         {
-            return FromPrivateKey(HexToBytes(privateKey));
+            return FromPrivateKey(HexToBytes(privateKey), prefix);
         }
     }
 }
