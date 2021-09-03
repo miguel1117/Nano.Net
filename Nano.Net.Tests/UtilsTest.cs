@@ -45,7 +45,7 @@ namespace Nano.Net.Tests
         public void AddressFromPublicKeyTest()
         {
             Assert.Equal(FirstAddress,
-                AddressFromPublicKey(HexToBytes(FirstPublicKey)),
+                AddressFromPublicKey(HexToBytes(FirstPublicKey), "nano"),
                 true);
         }
 
@@ -60,10 +60,10 @@ namespace Nano.Net.Tests
         [Fact]
         public void IsAddressValidTest()
         {
-            Assert.False(IsAddressValid("nano_1fed6j3ihjxs5ohrk9j56smyxoj4wirc5ja4ru5spqfkpue1xnxc1hk"));
-            Assert.False(IsAddressValid("nano_1aaaasfed6j3ihjxs5ohrk9j56smyxoj4wirc5ja4ru5spqfkpue1xnxc1hk"));
-            Assert.False(IsAddressValid("nan_1aq4tsfed6j3ihjxs5ohrk9j56smyxoj4wirc5ja4ru5spqfkpue1xnxc1hk"));
-            Assert.True(IsAddressValid("nano_1aq4tsfed6j3ihjxs5ohrk9j56smyxoj4wirc5ja4ru5spqfkpue1xnxc1hk"));
+            Assert.False(IsAddressValid("nano_1fed6j3ihjxs5ohrk9j56smyxoj4wirc5ja4ru5spqfkpue1xnxc1hk", new string[] {"nano", "xrb"}));
+            Assert.False(IsAddressValid("nano_1aaaasfed6j3ihjxs5ohrk9j56smyxoj4wirc5ja4ru5spqfkpue1xnxc1hk", new string[] {"nano", "xrb"}));
+            Assert.False(IsAddressValid("nan_1aq4tsfed6j3ihjxs5ohrk9j56smyxoj4wirc5ja4ru5spqfkpue1xnxc1hk", new string[] {"nano", "xrb"}));
+            Assert.True(IsAddressValid("nano_1aq4tsfed6j3ihjxs5ohrk9j56smyxoj4wirc5ja4ru5spqfkpue1xnxc1hk", new string[] {"nano", "xrb"}));
         }
 
         [Fact]

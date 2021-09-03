@@ -144,29 +144,31 @@ namespace Nano.Net
             return EncodeNanoBase32(final.Reverse().ToArray(), false);
         }
 
-        public static string AddressFromPublicKey(byte[] publicKey)
+        public static string AddressFromPublicKey(byte[] publicKey, string prefix)
         {
             if (publicKey.Length != 32)
                 throw new ArgumentException("A public key must be exactly 32 bytes.");
 
-            var address = "nano_";
+            if (!prefix.EndsWith("_"))
+                prefix += "_";
+            var address = prefix;
             address += EncodeNanoBase32(publicKey);
             address += EncodedAddressChecksum(publicKey);
 
             return address;
         }
 
-        public static byte[] PublicKeyFromAddress(string address)
+        public static byte[] PublicKeyFromAddress(string address) 
         {
-            if (IsAddressValid(address))
+            if (IsAddressValid(address, new string[] { address.Substring(0, address.IndexOf("_") )}))
                 return DecodeNanoBase32(address);
             else
                 throw new ArgumentException("This Nano address isn't valid.");
         }
 
-        public static bool IsAddressValid(string address)
+        public static bool IsAddressValid(string address, string[] allowedPrefixes)
         {
-            if (!Regex.IsMatch(address, @"^(nano|xrb)_[13]{1}[13456789abcdefghijkmnopqrstuwxyz]{59}$"))
+            if (!Regex.IsMatch(address, @$"^({string.Join("|", allowedPrefixes)})_[13]{{1}}[13456789abcdefghijkmnopqrstuwxyz]{{59}}$"))
                 return false;
 
             byte[] publicKey = DecodeNanoBase32(address);
