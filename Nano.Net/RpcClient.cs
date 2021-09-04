@@ -59,7 +59,7 @@ namespace Nano.Net
         }
 
         // Raw node RPC calls
-        
+
         /// <summary>
         /// Get information about a Nano account.
         /// </summary>
@@ -82,7 +82,7 @@ namespace Nano.Net
                     throw;
             }
         }
-        
+
         /// <summary>
         /// Generate a work nonce for a hash using the node.
         /// </summary>
@@ -91,22 +91,14 @@ namespace Nano.Net
         /// </remarks>
         public async Task<WorkGenerateResponse> WorkGenerateAsync(string hash, string difficulty = null)
         {
-            if (!string.IsNullOrEmpty(difficulty))
-            {
-                return await RpcRequestAsync<WorkGenerateResponse>(new
-                {
-                    Action = "work_generate",
-                    Hash = hash,
-                    Difficulty = difficulty
-                });
-            }
             return await RpcRequestAsync<WorkGenerateResponse>(new
             {
                 Action = "work_generate",
-                Hash = hash
+                Hash = hash,
+                Difficulty = difficulty
             });
         }
-        
+
         /// <summary>
         /// Gets the pending/receivable blocks for an account.
         /// </summary>
@@ -127,7 +119,7 @@ namespace Nano.Net
 
             return pendingBlocks;
         }
-        
+
         /// <summary>
         /// Publishes a Block to the network.
         /// </summary>
@@ -150,7 +142,7 @@ namespace Nano.Net
         }
 
         // Custom calls
-        
+
         /// <summary>
         /// Update an Account object's properties with relevant information from the network.
         /// </summary>
@@ -170,7 +162,7 @@ namespace Nano.Net
                 account.Representative = account.Address;
                 return;
             }
-            
+
             account.Opened = true;
             account.Frontier = accountInfo.Frontier;
             account.Balance = Amount.FromRaw(accountInfo.Balance);
