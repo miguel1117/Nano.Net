@@ -81,6 +81,16 @@ namespace Nano.Net
                     throw;
             }
         }
+
+        public async Task<AccountHistoryResponse> AccountHistoryAsync(string address, int count = 10)
+        {
+            return await RpcRequestAsync<AccountHistoryResponse>(new
+            {
+                Action = "account_history",
+                Account = address,
+                Count = count
+            });
+        }
         
         /// <summary>
         /// Generate a work nonce for a hash using the node.
