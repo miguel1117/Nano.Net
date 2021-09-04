@@ -19,6 +19,7 @@ namespace Nano.Net
 
         private readonly JsonSerializerSettings _jsonSerializerSettings = new JsonSerializerSettings
         {
+            NullValueHandling = NullValueHandling.Ignore,
             ContractResolver = new DefaultContractResolver()
             {
                 NamingStrategy = new SnakeCaseNamingStrategy()
@@ -58,7 +59,7 @@ namespace Nano.Net
         }
 
         // Raw node RPC calls
-        
+
         /// <summary>
         /// Get information about a Nano account.
         /// </summary>
@@ -84,7 +85,17 @@ namespace Nano.Net
                     throw;
             }
         }
-        
+  
+        public async Task<AccountHistoryResponse> AccountHistoryAsync(string address, int count = 10)
+        {
+            return await RpcRequestAsync<AccountHistoryResponse>(new
+            {
+                Action = "account_history",
+                Account = address,
+                Count = count
+            });
+        }
+      
         /// <summary>
         /// Generate a work nonce for a hash using the node.
         /// </summary>
@@ -93,22 +104,14 @@ namespace Nano.Net
         /// </remarks>
         public async Task<WorkGenerateResponse> WorkGenerateAsync(string hash, string difficulty = null)
         {
-            if (!string.IsNullOrEmpty(difficulty))
-            {
-                return await RpcRequestAsync<WorkGenerateResponse>(new
-                {
-                    Action = "work_generate",
-                    Hash = hash,
-                    Difficulty = difficulty
-                });
-            }
             return await RpcRequestAsync<WorkGenerateResponse>(new
             {
                 Action = "work_generate",
-                Hash = hash
+                Hash = hash,
+                Difficulty = difficulty
             });
         }
-        
+
         /// <summary>
         /// Gets the pending/receivable blocks for an account.
         /// </summary>
@@ -129,7 +132,17 @@ namespace Nano.Net
 
             return pendingBlocks;
         }
-        
+
+        public async Task<BlockInfoResponse> BlockInfoAsync(string hash)
+        {
+            return await RpcRequestAsync<BlockInfoResponse>(new
+            {
+                Action = "block_info",
+                json_block = "true",
+                Hash = hash
+            });
+        }
+
         /// <summary>
         /// Publishes a Block to the network.
         /// </summary>
@@ -151,8 +164,17 @@ namespace Nano.Net
             });
         }
 
+        public async Task<AccountsBalancesResponse> AccountsBalancesAsync(string[] accounts)
+        {
+            return await RpcRequestAsync<AccountsBalancesResponse>(new
+            {
+                Action = "accounts_balances",
+                Accounts = accounts
+            });
+        }
+
         // Custom calls
-        
+
         /// <summary>
         /// Update an Account object's properties with relevant information from the network.
         /// </summary>
@@ -172,7 +194,7 @@ namespace Nano.Net
                 account.Representative = account.Address;
                 return;
             }
-            
+
             account.Opened = true;
             account.Frontier = accountInfo.Frontier;
             account.Balance = Amount.FromRaw(accountInfo.Balance);
