@@ -27,9 +27,9 @@ namespace Nano.Net
         /// <param name="seed">The seed used to derivate the private key for this account</param>
         /// <param name="index">The index used to derive the key</param>
         /// <returns></returns>
-        public static Account FromSeed(string seed, uint index)
+        public static Account FromSeed(string seed, uint index, string prefix = "nano")
         {
-            return FromPrivateKey(DerivePrivateKey(seed, index));
+            return FromPrivateKey(DerivePrivateKey(seed, index), prefix);
         }
 
         /// <summary>
