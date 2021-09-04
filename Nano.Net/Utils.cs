@@ -158,16 +158,18 @@ namespace Nano.Net
             return address;
         }
 
-        public static byte[] PublicKeyFromAddress(string address) 
+        public static byte[] PublicKeyFromAddress(string address)
         {
-            if (IsAddressValid(address, new string[] { address.Substring(0, address.IndexOf("_") )}))
+            if (IsAddressValid(address, new string[] { address.Substring(0, address.IndexOf("_")) }))
                 return DecodeNanoBase32(address);
             else
                 throw new ArgumentException("This Nano address isn't valid.");
         }
 
-        public static bool IsAddressValid(string address, string[] allowedPrefixes)
+        public static bool IsAddressValid(string address, string[] allowedPrefixes = null)
         {
+            allowedPrefixes ??= new string[] { "nano, xrb" };
+
             if (!Regex.IsMatch(address, @$"^({string.Join("|", allowedPrefixes)})_[13]{{1}}[13456789abcdefghijkmnopqrstuwxyz]{{59}}$"))
                 return false;
 
@@ -175,7 +177,7 @@ namespace Nano.Net
 
             return EncodedAddressChecksum(publicKey) == address[^8..];
         }
-        
+
         // this could probably be made more efficient and it also needs more testing
         public static bool IsWorkValid(string hash, string powNonce, string threshold = null)
         {
@@ -187,7 +189,7 @@ namespace Nano.Net
 
             byte[] output = Blake2BHash(8, workBytes, hashBytes);
             ulong outputValue = BitConverter.ToUInt64(output);
-            
+
             return outputValue > thresholdValue;
         }
     }
