@@ -38,6 +38,34 @@ namespace Nano.Net.Tests
         }
 
         [Fact]
+        public async void AccountHistoryTest()
+        {
+            AccountHistoryResponse accountHistoryResponse = await _rpcClient.AccountHistoryAsync(Constants.ReferenceAccount);
+            HistoryBlock firstBlock = accountHistoryResponse.History[0];
+
+            Assert.Equal(Constants.ReferenceAccount, accountHistoryResponse.Account);
+            Assert.Equal("receive", firstBlock.Type);
+            Assert.Equal("75F0B821DE3B25908755520117660E1297DDEA774DEC817FAA2C27221442403A", firstBlock.Hash);
+        }
+
+        [Fact]
+        public async void AccountsBalanceTest()
+        {
+            AccountsBalancesResponse accountsBalancesResponse = await _rpcClient.AccountsBalancesAsync(new string[] { Constants.ReferenceAccount });
+
+            Assert.Equal("15000000000000000000000000000", accountsBalancesResponse.Balances[Constants.ReferenceAccount].Balance);
+        }
+
+        [Fact]
+        public async void BlockInfoTest()
+        {
+            BlockInfoResponse blockInfoResponse = await _rpcClient.BlockInfoAsync("75F0B821DE3B25908755520117660E1297DDEA774DEC817FAA2C27221442403A");
+
+            Assert.Equal("15000000000000000000000000000", blockInfoResponse.Balance);
+            Assert.Equal("nano_1iuz18n4g4wfp9gf7p1s8qkygxw7wx9qfjq6a9aq68uyrdnningdcjontgar", blockInfoResponse.Content.Representative);
+        }
+
+        [Fact]
         public async void WorkGenerateTest()
         {
             /*const string hash = "3865BFCD423CE3579C4A7C6010CE763BE4C63964AC06BDA451A63BBCAC9E3712";
