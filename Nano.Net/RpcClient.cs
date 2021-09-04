@@ -148,6 +148,15 @@ namespace Nano.Net
             });
         }
 
+        public async Task<AccountsBalancesResponse> AccountsBalancesAsync(string[] accounts)
+        {
+            return await RpcRequestAsync<AccountsBalancesResponse>(new
+            {
+                Action = "accounts_balances",
+                Accounts = accounts
+            });
+        }
+
         // Custom calls
         
         /// <summary>
