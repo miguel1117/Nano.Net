@@ -12,7 +12,9 @@ namespace Nano.Net
     /// </summary>
     public class Block : BlockBase
     {
+        // these properties aren't included inside the block itself, so they shouldn't be serialized
         [JsonIgnore] public string Hash => GetHash();
+        [JsonIgnore] public string Subtype { get; init; }
 
         /// <summary>
         /// Create a send block and sign it. Requires the sending Account object to have all the properties correctly set.
