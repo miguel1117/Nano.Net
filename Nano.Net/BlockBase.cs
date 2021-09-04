@@ -21,6 +21,8 @@ namespace Nano.Net
 
         [JsonProperty("link")]
         public string Link { get; init; }
+        [JsonProperty("link_as_account")]
+        public string LinkAsAccount { get; init; }
 
         [JsonProperty("signature")]
         public string Signature { get; set; }

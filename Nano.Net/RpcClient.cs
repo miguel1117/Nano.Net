@@ -120,6 +120,16 @@ namespace Nano.Net
             return pendingBlocks;
         }
 
+        public async Task<BlockInfoResponse> BlockInfoAsync(string hash)
+        {
+            return await RpcRequestAsync<BlockInfoResponse>(new
+            {
+                Action = "block_info",
+                json_block = "true",
+                Hash = hash
+            });
+        }
+
         /// <summary>
         /// Publishes a Block to the network.
         /// </summary>
