@@ -16,7 +16,7 @@ namespace Nano.Net
         public ulong LocalTimestamp { get; set; }
         [JsonProperty("confirmed")]
         public bool Confirmed { get; set; }
-        [JsonProperty("content")]
+        [JsonProperty("contents")]
         public BlockInfoResponseContent Content { get; set; }
         [JsonProperty("subtype")]
         public string Subtype { get; set; }
