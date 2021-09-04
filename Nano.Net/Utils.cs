@@ -144,7 +144,7 @@ namespace Nano.Net
             return EncodeNanoBase32(final.Reverse().ToArray(), false);
         }
 
-        public static string AddressFromPublicKey(byte[] publicKey, string prefix)
+        public static string AddressFromPublicKey(byte[] publicKey, string prefix = "nano")
         {
             if (publicKey.Length != 32)
                 throw new ArgumentException("A public key must be exactly 32 bytes.");
