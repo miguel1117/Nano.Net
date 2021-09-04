@@ -168,7 +168,7 @@ namespace Nano.Net
 
         public static bool IsAddressValid(string address, string[] allowedPrefixes = null)
         {
-            allowedPrefixes ??= new string[] { "nano, xrb" };
+            allowedPrefixes ??= new string[] { "nano", "xrb" };
 
             if (!Regex.IsMatch(address, @$"^({string.Join("|", allowedPrefixes)})_[13]{{1}}[13456789abcdefghijkmnopqrstuwxyz]{{59}}$"))
                 return false;
