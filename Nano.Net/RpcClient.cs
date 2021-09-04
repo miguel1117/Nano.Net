@@ -74,7 +74,7 @@ namespace Nano.Net
                     Representative = representative,
                     Pending = pending,
                     Weight = weight,
-                    include_confirmed = confirmed
+                    IncludeConfirmed = confirmed
                 });
             }
             catch (RpcException exception)
