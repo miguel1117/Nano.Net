@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using Newtonsoft.Json;
 
 namespace Nano.Net
@@ -8,7 +7,7 @@ namespace Nano.Net
         [JsonProperty("account")]
         public string Account { get; set; }
         [JsonProperty("history")]
-        public List<HistoryBlock> History { get; set; }
+        public HistoryBlock[] History { get; set; }
         [JsonProperty("previous")]
         public string Previous { get; set; }
     }
