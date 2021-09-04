@@ -63,7 +63,7 @@ namespace Nano.Net
         /// <summary>
         /// Get information about a Nano account.
         /// </summary>
-        public async Task<AccountInfoResponse> AccountInfoAsync(string address, bool representative = true)
+        public async Task<AccountInfoResponse> AccountInfoAsync(string address, bool representative = true, bool pending = true, bool weight = true, bool confirmed = true)
         {
             try
             {
@@ -71,7 +71,10 @@ namespace Nano.Net
                 {
                     Action = "account_info",
                     Account = address,
-                    Representative = representative
+                    Representative = representative,
+                    Pending = pending,
+                    Weight = weight,
+                    IncludeConfirmed = confirmed
                 });
             }
             catch (RpcException exception)
