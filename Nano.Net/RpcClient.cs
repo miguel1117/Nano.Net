@@ -88,7 +88,7 @@ namespace Nano.Net
         /// <remarks>
         /// WARNING: This command is usually disabled on public nodes. You need to use your own node.
         /// </remarks>
-        public async Task<WorkGenerateResponse> WorkGenerateAsync(string hash, string difficulty = "")
+        public async Task<WorkGenerateResponse> WorkGenerateAsync(string hash, string difficulty = null)
         {
             if (!string.IsNullOrEmpty(difficulty))
             {
