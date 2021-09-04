@@ -9,6 +9,7 @@ Still in development. Please feel free to submit any changes, bugfixes or new fe
 * [x] Local block signing
 * [x] Unit conversion
 * [x] RPC client for interacting with the network
+* [x] Banano support
 * [ ] Good documentation
 
 ## Requirements
@@ -45,6 +46,12 @@ Account account1 = Account.FromSeed(randomSeed, 5);
 
 // Create an Account from a private key
 Account account2 = Account.FromPrivateKey("A066701E0641E524662E3B7F67F98A248C300017BAA8AA0D91A95A2BCAF8D4D8");
+```
+**Account creation for Banano**
+```c#
+string randomSeed = Utils.GenerateSeed();
+//Specify the prefix
+Account account = Account.FromSeed(randomSeed, "ban");
 ```
 
 **Key and address conversion**

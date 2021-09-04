@@ -19,6 +19,7 @@ namespace Nano.Net
 
         private readonly JsonSerializerSettings _jsonSerializerSettings = new JsonSerializerSettings
         {
+            NullValueHandling = NullValueHandling.Ignore,
             ContractResolver = new DefaultContractResolver()
             {
                 NamingStrategy = new SnakeCaseNamingStrategy()
@@ -88,8 +89,17 @@ namespace Nano.Net
         /// <remarks>
         /// WARNING: This command is usually disabled on public nodes. You need to use your own node.
         /// </remarks>
-        public async Task<WorkGenerateResponse> WorkGenerateAsync(string hash)
+        public async Task<WorkGenerateResponse> WorkGenerateAsync(string hash, string difficulty = null)
         {
+            if (!string.IsNullOrEmpty(difficulty))
+            {
+                return await RpcRequestAsync<WorkGenerateResponse>(new
+                {
+                    Action = "work_generate",
+                    Hash = hash,
+                    Difficulty = difficulty
+                });
+            }
             return await RpcRequestAsync<WorkGenerateResponse>(new
             {
                 Action = "work_generate",
@@ -111,8 +121,9 @@ namespace Nano.Net
                 IncludeOnlyConfirmed = true
             });
 
-            foreach ((string key, ReceivableBlock value) in pendingBlocks.PendingBlocks)
-                value.Hash = key;
+            if (pendingBlocks?.PendingBlocks != null)
+                foreach ((string key, ReceivableBlock value) in pendingBlocks?.PendingBlocks)
+                    value.Hash = key;
 
             return pendingBlocks;
         }
