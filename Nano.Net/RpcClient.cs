@@ -85,6 +85,15 @@ namespace Nano.Net
                     throw;
             }
         }
+
+        public async Task<AccountsFrontiersResponse> AccountsFrontiersAsync(string[] accounts)
+        {
+            return await RpcRequestAsync<AccountsFrontiersResponse>(new
+            {
+                Action = "accounts_frontiers",
+                Accounts = accounts
+            });
+        }
   
         public async Task<AccountHistoryResponse> AccountHistoryAsync(string address, int count = 10)
         {
