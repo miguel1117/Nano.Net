@@ -10,9 +10,11 @@ namespace Nano.Net.WebSockets
 {
     public class NanoWebSocketClient
     {
+        public delegate void MessageReceivedEventHandler(NanoWebSocketClient client, string topic, IMessage message);
         public delegate void ConfirmationMessageHandler(NanoWebSocketClient client, ConfirmationMessage topicMessage);
         public delegate void UnconfirmedBlockMessageHandler(NanoWebSocketClient client, NewUnconfirmedBlockMessage topicMessage);
-
+        
+        public event MessageReceivedEventHandler NewMessage;
         public event ConfirmationMessageHandler Confirmation;
         public event UnconfirmedBlockMessageHandler NewUnconfirmedBlock;
 
@@ -55,21 +57,33 @@ namespace Nano.Net.WebSockets
                     return;
                 }
 
-                string messageJson = Encoding.Default.GetString(content).TrimEnd((char)0);
-                string topic = JObject.Parse(messageJson).GetValue("topic").ToString();
+                string messageString = Encoding.Default.GetString(content).TrimEnd((char)0);
+                var messageJson = JObject.Parse(messageString);
+                var topic = messageJson["topic"]?.ToString();
 
+                if (!messageJson.ContainsKey("topic"))
+                    throw new NanoWebSocketException("NanoWebSocketClient received unexpected message.");
+                
+                IMessage message;
                 switch (topic)
                 {
                     case "confirmation":
-                        var confirmationMessage = JsonConvert.DeserializeObject<ConfirmationMessage>(messageJson);
+                        var confirmationMessage = JsonConvert.DeserializeObject<ConfirmationMessage>(messageString);
+                        message = confirmationMessage;
                         Confirmation?.Invoke(this, confirmationMessage);
                         break;
                     
                     case "new_unconfirmed_block":
-                        var unconfirmedBlockMessage = JsonConvert.DeserializeObject<NewUnconfirmedBlockMessage>(messageJson);
+                        var unconfirmedBlockMessage = JsonConvert.DeserializeObject<NewUnconfirmedBlockMessage>(messageString);
+                        message = unconfirmedBlockMessage;
                         NewUnconfirmedBlock?.Invoke(this, unconfirmedBlockMessage);
                         break;
+                    
+                    default: 
+                        throw new NanoWebSocketException("Receive topic that has not been implemented.");
                 }
+                
+                NewMessage?.Invoke(this, topic, message);
             }
         }
 
