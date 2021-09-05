@@ -4,14 +4,17 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace Nano.Net.WebSockets
 {
     public class NanoWebSocketClient
     {
-        public delegate void NotificationEventHandler(NanoWebSocketClient client, TopicMessage topicMessage);
+        public delegate void ConfirmationMessageHandler(NanoWebSocketClient client, ConfirmationMessage topicMessage);
+        public delegate void UnconfirmedBlockMessageHandler(NanoWebSocketClient client, NewUnconfirmedBlockMessage topicMessage);
 
-        public event NotificationEventHandler Confirmation;
+        public event ConfirmationMessageHandler Confirmation;
+        public event UnconfirmedBlockMessageHandler NewUnconfirmedBlock;
 
         private readonly ClientWebSocket _clientWebSocket = new ClientWebSocket();
         private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
@@ -20,7 +23,7 @@ namespace Nano.Net.WebSockets
         private NanoWebSocketClient()
         {
         }
-        
+
         public static async Task<NanoWebSocketClient> Connect(string url)
         {
             var webSocket = new NanoWebSocketClient();
@@ -37,7 +40,7 @@ namespace Nano.Net.WebSockets
             _clientWebSocket.Abort();
             _clientWebSocket.Dispose();
         }
-        
+
         private async Task Loop()
         {
             while (!_cancellationTokenSource.Token.IsCancellationRequested)
@@ -51,12 +54,23 @@ namespace Nano.Net.WebSockets
                 {
                     return;
                 }
+
                 string messageJson = Encoding.Default.GetString(content).TrimEnd((char)0);
+                string topic = JObject.Parse(messageJson).GetValue("topic").ToString();
 
-                var confirm = JsonConvert.DeserializeObject<ConfirmationTopicMessage>(messageJson);
-                confirm.OriginalJson = messageJson; // include the original json message in the message object
-
-                Confirmation?.Invoke(this, confirm);
+                switch (topic)
+                {
+                    case "confirmation":
+                        var confirmationMessage = JsonConvert.DeserializeObject<ConfirmationMessage>(messageJson);
+                        confirmationMessage.OriginalJson = messageJson;
+                        Confirmation?.Invoke(this, confirmationMessage);
+                        break;
+                    case "new_unconfirmed_block":
+                        var unconfirmedBlockMessage = JsonConvert.DeserializeObject<NewUnconfirmedBlockMessage>(messageJson);
+                        unconfirmedBlockMessage.OriginalJson = messageJson;
+                        NewUnconfirmedBlock?.Invoke(this, unconfirmedBlockMessage);
+                        break;
+                }
             }
         }
 
@@ -64,8 +78,7 @@ namespace Nano.Net.WebSockets
         {
             if (_loop.IsCompleted)
                 throw new Exception("This websocket instance has been closed and therefore no subscriptions can't be made.");
-            Console.WriteLine(topic.GetSubscribeCommand());
-            
+
             await _clientWebSocket.SendAsync(Encoding.Default.GetBytes(topic.GetSubscribeCommand()), WebSocketMessageType.Text, true, CancellationToken.None);
         }
     }
