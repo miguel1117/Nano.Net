@@ -62,12 +62,11 @@ namespace Nano.Net.WebSockets
                 {
                     case "confirmation":
                         var confirmationMessage = JsonConvert.DeserializeObject<ConfirmationMessage>(messageJson);
-                        confirmationMessage.OriginalJson = messageJson;
                         Confirmation?.Invoke(this, confirmationMessage);
                         break;
+                    
                     case "new_unconfirmed_block":
                         var unconfirmedBlockMessage = JsonConvert.DeserializeObject<NewUnconfirmedBlockMessage>(messageJson);
-                        unconfirmedBlockMessage.OriginalJson = messageJson;
                         NewUnconfirmedBlock?.Invoke(this, unconfirmedBlockMessage);
                         break;
                 }
