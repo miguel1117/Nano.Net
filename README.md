@@ -9,13 +9,23 @@ Still in development. Please feel free to submit any changes, bugfixes or new fe
 * [x] Local block signing
 * [x] Unit conversion
 * [x] RPC client for interacting with the network
-* [ ] Improve documentation
+* [x] Banano support
+* [ ] Good documentation
 
+## Requirements
+* .NET 5.0 or .NET Core 3.1
+* C# 9
 
 ## Installation
 You can either:
-* Download the package [from Nuget](https://www.nuget.org/packages/Nano.Net/)
-* Clone the repository, build the source and copy the DLL to your project
+* Install the package [from Nuget](https://www.nuget.org/packages/Nano.Net/)
+* Build the project and copy the binaries to your project
+* If your project targets .NET Core then the C# version should be set to version 9 in the .csproj file. Example: 
+```xml
+<PropertyGroup>
+	<LangVersion>9.0</LangVersion>
+</PropertyGroup>
+```
 
 
 ## Usage
@@ -36,6 +46,12 @@ Account account1 = Account.FromSeed(randomSeed, 5);
 
 // Create an Account from a private key
 Account account2 = Account.FromPrivateKey("A066701E0641E524662E3B7F67F98A248C300017BAA8AA0D91A95A2BCAF8D4D8");
+```
+**Account creation for Banano**
+```c#
+string randomSeed = Utils.GenerateSeed();
+//Specify the prefix
+Account account = Account.FromSeed(randomSeed, "ban");
 ```
 
 **Key and address conversion**
@@ -62,7 +78,7 @@ Account account = Account.FromPrivateKey("A066701E0641E524662E3B7F67F98A248C3000
 // Sets the balance, representative and frontier for this account from a node. Can also be set manually.
 await rpcClient.UpdateAccountAsync(account);
             
-// Creates a block and automatically sign it. The PoW nonce has to be obtained externally. Unit conversion isn't implemented yet.
+// Creates a block and automatically sign it. The PoW nonce has to be obtained externally.
 var sendBlock = Block.CreateSendBlock(account,
     "nano_3tjhazni9juaoa8q9rw33nf3f6i45gswhpzrgrbrawxhh7a777ror9okstch",
     Amount.FromRaw("1"), 

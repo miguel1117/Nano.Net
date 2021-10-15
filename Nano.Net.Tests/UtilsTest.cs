@@ -18,7 +18,7 @@ namespace Nano.Net.Tests
             Assert.Throws<ArgumentException>(() => HexToBytes("ABCDE")); // invalid hex string size, must be a multiple of 2
             Assert.Throws<ArgumentException>(() => HexToBytes("ABCK")); // invalid hex characters
         }
-        
+
         [Fact]
         public void DerivePrivateKeyTest()
         {
@@ -45,7 +45,7 @@ namespace Nano.Net.Tests
         public void AddressFromPublicKeyTest()
         {
             Assert.Equal(FirstAddress,
-                AddressFromPublicKey(HexToBytes(FirstPublicKey)),
+                AddressFromPublicKey(HexToBytes(FirstPublicKey), "nano"),
                 true);
         }
 
@@ -64,6 +64,8 @@ namespace Nano.Net.Tests
             Assert.False(IsAddressValid("nano_1aaaasfed6j3ihjxs5ohrk9j56smyxoj4wirc5ja4ru5spqfkpue1xnxc1hk"));
             Assert.False(IsAddressValid("nan_1aq4tsfed6j3ihjxs5ohrk9j56smyxoj4wirc5ja4ru5spqfkpue1xnxc1hk"));
             Assert.True(IsAddressValid("nano_1aq4tsfed6j3ihjxs5ohrk9j56smyxoj4wirc5ja4ru5spqfkpue1xnxc1hk"));
+            Assert.False(IsAddressValid("ban_1aq4tsfed6j3ihjxs5ohrk9j56smyxoj4wirc5ja4ru5spqfkpue1xnxc1hk"));
+            Assert.True(IsAddressValid("ban_1aq4tsfed6j3ihjxs5ohrk9j56smyxoj4wirc5ja4ru5spqfkpue1xnxc1hk", new string[] { "ban" }));
         }
 
         [Fact]

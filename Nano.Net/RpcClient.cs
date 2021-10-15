@@ -19,6 +19,7 @@ namespace Nano.Net
 
         private readonly JsonSerializerSettings _jsonSerializerSettings = new JsonSerializerSettings
         {
+            NullValueHandling = NullValueHandling.Ignore,
             ContractResolver = new DefaultContractResolver()
             {
                 NamingStrategy = new SnakeCaseNamingStrategy()
@@ -26,7 +27,7 @@ namespace Nano.Net
         };
 
         /// <summary>
-        /// Initialize rpc to a local node with default settings
+        /// Create a new RpcClient connected to a local node.
         /// </summary>
         public RpcClient()
         {
@@ -57,14 +58,12 @@ namespace Nano.Net
             return JsonConvert.DeserializeObject<T>(json);
         }
 
-        // Default node RPC calls
+        // Raw node RPC calls
+
         /// <summary>
-        /// Get information about a Nano account
+        /// Get information about a Nano account.
         /// </summary>
-        /// <param name="address"></param>
-        /// <param name="representative"></param>
-        /// <returns></returns>
-        public async Task<AccountInfoResponse> AccountInfoAsync(string address, bool representative = true)
+        public async Task<AccountInfoResponse> AccountInfoAsync(string address, bool representative = true, bool pending = true, bool weight = true, bool confirmed = true)
         {
             try
             {
@@ -72,7 +71,10 @@ namespace Nano.Net
                 {
                     Action = "account_info",
                     Account = address,
-                    Representative = representative
+                    Representative = representative,
+                    Pending = pending,
+                    Weight = weight,
+                    IncludeConfirmed = confirmed
                 });
             }
             catch (RpcException exception)
@@ -84,16 +86,44 @@ namespace Nano.Net
             }
         }
 
-        /// <summary>WARNING: This command is usually disabled on public nodes. You need to use your own node.</summary>
-        public async Task<WorkGenerateResponse> WorkGenerateAsync(string hash)
+        public async Task<AccountsFrontiersResponse> AccountsFrontiersAsync(string[] accounts)
+        {
+            return await RpcRequestAsync<AccountsFrontiersResponse>(new
+            {
+                Action = "accounts_frontiers",
+                Accounts = accounts
+            });
+        }
+  
+        public async Task<AccountHistoryResponse> AccountHistoryAsync(string address, int count = 10)
+        {
+            return await RpcRequestAsync<AccountHistoryResponse>(new
+            {
+                Action = "account_history",
+                Account = address,
+                Count = count
+            });
+        }
+      
+        /// <summary>
+        /// Generate a work nonce for a hash using the node.
+        /// </summary>
+        /// <remarks>
+        /// WARNING: This command is usually disabled on public nodes. You need to use your own node.
+        /// </remarks>
+        public async Task<WorkGenerateResponse> WorkGenerateAsync(string hash, string difficulty = null)
         {
             return await RpcRequestAsync<WorkGenerateResponse>(new
             {
                 Action = "work_generate",
-                Hash = hash
+                Hash = hash,
+                Difficulty = difficulty
             });
         }
 
+        /// <summary>
+        /// Gets the pending/receivable blocks for an account.
+        /// </summary>
         public async Task<ReceivableBlocksResponse> PendingBlocksAsync(string address, int count = 5)
         {
             var pendingBlocks = await RpcRequestAsync<ReceivableBlocksResponse>(new
@@ -105,19 +135,34 @@ namespace Nano.Net
                 IncludeOnlyConfirmed = true
             });
 
-            foreach ((string key, ReceivableBlock value) in pendingBlocks.PendingBlocks)
-                value.Hash = key;
+            if (pendingBlocks?.PendingBlocks != null)
+                foreach ((string key, ReceivableBlock value) in pendingBlocks?.PendingBlocks)
+                    value.Hash = key;
 
             return pendingBlocks;
         }
 
+        public async Task<BlockInfoResponse> BlockInfoAsync(string hash)
+        {
+            return await RpcRequestAsync<BlockInfoResponse>(new
+            {
+                Action = "block_info",
+                json_block = "true",
+                Hash = hash
+            });
+        }
+
+        /// <summary>
+        /// Publishes a Block to the network.
+        /// </summary>
+        /// <exception cref="Exception">If the block signature or work nonce hasn't been set.</exception>
         public async Task<ProcessResponse> ProcessAsync(Block block)
         {
             if (block.Signature is null)
-                throw new Exception("This block hasn't been signed yet.");
+                throw new IncompleteBlockException("This block hasn't been signed yet.");
 
             if (block.Work is null)
-                throw new Exception("The PoW nonce for this block hasn't been set.");
+                throw new IncompleteBlockException("The PoW nonce for this block hasn't been set.");
 
             return await RpcRequestAsync<ProcessResponse>(new
             {
@@ -128,8 +173,20 @@ namespace Nano.Net
             });
         }
 
+        public async Task<AccountsBalancesResponse> AccountsBalancesAsync(string[] accounts)
+        {
+            return await RpcRequestAsync<AccountsBalancesResponse>(new
+            {
+                Action = "accounts_balances",
+                Accounts = accounts
+            });
+        }
+
         // Custom calls
 
+        /// <summary>
+        /// Update an Account object's properties with relevant information from the network.
+        /// </summary>
         public async Task UpdateAccountAsync(Account account)
         {
             AccountInfoResponse accountInfo;
@@ -146,7 +203,7 @@ namespace Nano.Net
                 account.Representative = account.Address;
                 return;
             }
-            
+
             account.Opened = true;
             account.Frontier = accountInfo.Frontier;
             account.Balance = Amount.FromRaw(accountInfo.Balance);

@@ -144,12 +144,14 @@ namespace Nano.Net
             return EncodeNanoBase32(final.Reverse().ToArray(), false);
         }
 
-        public static string AddressFromPublicKey(byte[] publicKey)
+        public static string AddressFromPublicKey(byte[] publicKey, string prefix = "nano")
         {
             if (publicKey.Length != 32)
                 throw new ArgumentException("A public key must be exactly 32 bytes.");
 
-            var address = "nano_";
+            if (!prefix.EndsWith("_"))
+                prefix += "_";
+            var address = prefix;
             address += EncodeNanoBase32(publicKey);
             address += EncodedAddressChecksum(publicKey);
 
@@ -158,22 +160,25 @@ namespace Nano.Net
 
         public static byte[] PublicKeyFromAddress(string address)
         {
-            if (IsAddressValid(address))
+            if (IsAddressValid(address, new string[] { address.Substring(0, address.IndexOf("_")) }))
                 return DecodeNanoBase32(address);
             else
                 throw new ArgumentException("This Nano address isn't valid.");
         }
 
-        public static bool IsAddressValid(string address)
+        public static bool IsAddressValid(string address, string[] allowedPrefixes = null)
         {
-            if (!Regex.IsMatch(address, @"^(nano|xrb)_[13]{1}[13456789abcdefghijkmnopqrstuwxyz]{59}$"))
+            allowedPrefixes ??= new string[] { "nano", "xrb" };
+
+            if (!Regex.IsMatch(address, @$"^({string.Join("|", allowedPrefixes)})_[13]{{1}}[13456789abcdefghijkmnopqrstuwxyz]{{59}}$"))
                 return false;
 
             byte[] publicKey = DecodeNanoBase32(address);
 
             return EncodedAddressChecksum(publicKey) == address[^8..];
         }
-        
+
+        // this could probably be made more efficient and it also needs more testing
         public static bool IsWorkValid(string hash, string powNonce, string threshold = null)
         {
             byte[] thresholdBytes = threshold is null ? HexToBytes("fffffff800000000") : HexToBytes(threshold);
@@ -184,7 +189,7 @@ namespace Nano.Net
 
             byte[] output = Blake2BHash(8, workBytes, hashBytes);
             ulong outputValue = BitConverter.ToUInt64(output);
-            
+
             return outputValue > thresholdValue;
         }
     }
