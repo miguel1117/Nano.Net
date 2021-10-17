@@ -2,7 +2,7 @@
 
 namespace Nano.Net.WebSockets
 {
-    public class NewUnconfirmedBlockMessage : IMessage
+    public class NewUnconfirmedBlockTopicMessage : ITopicMessage
     {
         [JsonProperty("topic")]
         public string Topic { get; init; }

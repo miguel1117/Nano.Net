@@ -10,9 +10,9 @@ namespace Nano.Net.WebSockets
 {
     public class NanoWebSocketClient
     {
-        public delegate void MessageReceivedEventHandler(NanoWebSocketClient client, string topic, IMessage message);
-        public delegate void ConfirmationMessageHandler(NanoWebSocketClient client, ConfirmationMessage topicMessage);
-        public delegate void UnconfirmedBlockMessageHandler(NanoWebSocketClient client, NewUnconfirmedBlockMessage topicMessage);
+        public delegate void MessageReceivedEventHandler(NanoWebSocketClient client, string topic, ITopicMessage topicMessage);
+        public delegate void ConfirmationMessageHandler(NanoWebSocketClient client, ConfirmationTopicMessage topicTopicMessage);
+        public delegate void UnconfirmedBlockMessageHandler(NanoWebSocketClient client, NewUnconfirmedBlockTopicMessage topicTopicMessage);
         
         public event MessageReceivedEventHandler NewMessage;
         public event ConfirmationMessageHandler Confirmation;
@@ -21,6 +21,7 @@ namespace Nano.Net.WebSockets
         private readonly ClientWebSocket _clientWebSocket = new ClientWebSocket();
         private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
         private Task _loop;
+        private TaskCompletionSource<PingMessage> _ping;
 
         private NanoWebSocketClient()
         {
@@ -59,32 +60,46 @@ namespace Nano.Net.WebSockets
 
                 string messageString = Encoding.Default.GetString(content).TrimEnd((char)0);
                 var messageJson = JObject.Parse(messageString);
-                var topic = messageJson["topic"]?.ToString();
-
-                if (!messageJson.ContainsKey("topic"))
-                    throw new NanoWebSocketException("NanoWebSocketClient received unexpected message.");
                 
-                IMessage message;
+                // listen for ping responses
+                if (_ping is not null && messageJson["ack"]?.ToString() == "pong")
+                {
+                    _ping.TrySetResult(JsonConvert.DeserializeObject<PingMessage>(messageString));
+                    continue;
+                }
+                    
+                var topic = messageJson["topic"]?.ToString();
                 switch (topic)
                 {
+                    case null:
+                        throw new NanoWebSocketException("NanoWebSocketClient received unexpected message.");
+                    
                     case "confirmation":
-                        var confirmationMessage = JsonConvert.DeserializeObject<ConfirmationMessage>(messageString);
-                        message = confirmationMessage;
+                        var confirmationMessage = JsonConvert.DeserializeObject<ConfirmationTopicMessage>(messageString);
+                        NewMessage?.Invoke(this, topic, confirmationMessage);
                         Confirmation?.Invoke(this, confirmationMessage);
                         break;
                     
                     case "new_unconfirmed_block":
-                        var unconfirmedBlockMessage = JsonConvert.DeserializeObject<NewUnconfirmedBlockMessage>(messageString);
-                        message = unconfirmedBlockMessage;
+                        var unconfirmedBlockMessage = JsonConvert.DeserializeObject<NewUnconfirmedBlockTopicMessage>(messageString);
+                        NewMessage?.Invoke(this, topic, unconfirmedBlockMessage);
                         NewUnconfirmedBlock?.Invoke(this, unconfirmedBlockMessage);
                         break;
-                    
-                    default: 
-                        throw new NanoWebSocketException("Receive topic that has not been implemented.");
                 }
-                
-                NewMessage?.Invoke(this, topic, message);
             }
+        }
+
+        public async Task<PingMessage> Ping()
+        {
+            const string ping = "{ \"action\": \"ping\" }";
+            
+            _ping = new TaskCompletionSource<PingMessage>();
+            await _clientWebSocket.SendAsync(Encoding.Default.GetBytes(ping), WebSocketMessageType.Text, true, CancellationToken.None);
+
+            if (await Task.WhenAny(_ping.Task, Task.Delay(10000)) == _ping.Task)
+                return _ping.Task.Result;
+            else
+                throw new NanoWebSocketException("Ping timeout exceeded.");
         }
 
         public async Task Subscribe(Topic topic)
