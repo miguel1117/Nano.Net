@@ -1,113 +1,100 @@
 ﻿using System;
-using System.Net.WebSockets;
-using System.Text;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Websocket.Client;
 
 namespace Nano.Net.WebSockets
 {
     public class NanoWebSocketClient
     {
         public delegate void MessageReceivedEventHandler(NanoWebSocketClient client, string topic, ITopicMessage topicMessage);
+
         public delegate void ConfirmationMessageHandler(NanoWebSocketClient client, ConfirmationTopicMessage topicTopicMessage);
+
         public delegate void UnconfirmedBlockMessageHandler(NanoWebSocketClient client, NewUnconfirmedBlockTopicMessage topicTopicMessage);
-        
+
         public event MessageReceivedEventHandler NewMessage;
         public event ConfirmationMessageHandler Confirmation;
         public event UnconfirmedBlockMessageHandler NewUnconfirmedBlock;
 
-        private readonly ClientWebSocket _clientWebSocket = new ClientWebSocket();
+        private readonly List<Topic> _subscriptions = new List<Topic>();
+        private readonly WebsocketClient _clientWebSocket;
         private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
-        private Task _loop;
-        private TaskCompletionSource<PingMessage> _ping;
+        private TaskCompletionSource<PingMessage> _pingResponseMessage;
 
-        private NanoWebSocketClient()
+        public NanoWebSocketClient(string url, double timeoutInSeconds = 20D)
         {
+            _clientWebSocket = new WebsocketClient(new Uri(url));
+            
+            _clientWebSocket.ReconnectTimeout = TimeSpan.FromSeconds(timeoutInSeconds);
+            _clientWebSocket.MessageReceived.Subscribe(c => OnMessage(c));
+            _clientWebSocket.ReconnectionHappened.Subscribe(_ => OnReconnect());
         }
 
-        public static async Task<NanoWebSocketClient> Connect(string url)
+        public async Task Start()
         {
-            var webSocket = new NanoWebSocketClient();
-            await webSocket._clientWebSocket.ConnectAsync(new Uri(url), CancellationToken.None);
-            webSocket._loop = webSocket.Loop();
-
-            return webSocket;
+            await _clientWebSocket.Start();
         }
 
-        public async Task Stop()
+        private void OnMessage(ResponseMessage message)
         {
-            _cancellationTokenSource.Cancel();
-            await _loop; // wait for loop to close
-            _clientWebSocket.Abort();
-            _clientWebSocket.Dispose();
-        }
+            var messageString = message.ToString();
+            var messageJson = JObject.Parse(messageString);
 
-        private async Task Loop()
-        {
-            while (!_cancellationTokenSource.Token.IsCancellationRequested)
+            // listen for ping responses
+            if (_pingResponseMessage is not null && messageJson["ack"]?.ToString() == "pong")
             {
-                var content = new byte[2048];
-                try
-                {
-                    await _clientWebSocket.ReceiveAsync(content, _cancellationTokenSource.Token);
-                }
-                catch (TaskCanceledException)
-                {
-                    return;
-                }
+                _pingResponseMessage.TrySetResult(JsonConvert.DeserializeObject<PingMessage>(messageString));
+                return;
+            }
 
-                string messageString = Encoding.Default.GetString(content).TrimEnd((char)0);
-                var messageJson = JObject.Parse(messageString);
-                
-                // listen for ping responses
-                if (_ping is not null && messageJson["ack"]?.ToString() == "pong")
-                {
-                    _ping.TrySetResult(JsonConvert.DeserializeObject<PingMessage>(messageString));
-                    continue;
-                }
-                    
-                var topic = messageJson["topic"]?.ToString();
-                switch (topic)
-                {
-                    case null:
-                        throw new NanoWebSocketException("NanoWebSocketClient received unexpected message.");
-                    
-                    case "confirmation":
-                        var confirmationMessage = JsonConvert.DeserializeObject<ConfirmationTopicMessage>(messageString);
-                        NewMessage?.Invoke(this, topic, confirmationMessage);
-                        Confirmation?.Invoke(this, confirmationMessage);
-                        break;
-                    
-                    case "new_unconfirmed_block":
-                        var unconfirmedBlockMessage = JsonConvert.DeserializeObject<NewUnconfirmedBlockTopicMessage>(messageString);
-                        NewMessage?.Invoke(this, topic, unconfirmedBlockMessage);
-                        NewUnconfirmedBlock?.Invoke(this, unconfirmedBlockMessage);
-                        break;
-                }
+            var topic = messageJson["topic"]?.ToString();
+            switch (topic)
+            {
+                case null:
+                    throw new NanoWebSocketException("NanoWebSocketClient received unexpected message.");
+
+                case "confirmation":
+                    var confirmationMessage = JsonConvert.DeserializeObject<ConfirmationTopicMessage>(messageString);
+                    NewMessage?.Invoke(this, topic, confirmationMessage);
+                    Confirmation?.Invoke(this, confirmationMessage);
+                    break;
+
+                case "new_unconfirmed_block":
+                    var unconfirmedBlockMessage = JsonConvert.DeserializeObject<NewUnconfirmedBlockTopicMessage>(messageString);
+                    NewMessage?.Invoke(this, topic, unconfirmedBlockMessage);
+                    NewUnconfirmedBlock?.Invoke(this, unconfirmedBlockMessage);
+                    break;
             }
         }
 
+        private void OnReconnect()
+        {
+            foreach (Topic subscription in _subscriptions)
+                _clientWebSocket.Send(subscription.GetSubscribeCommand());
+        }
+        
+        // maybe there is a better way to do this, but i just can't imagine any right now
         public async Task<PingMessage> Ping()
         {
             const string ping = "{ \"action\": \"ping\" }";
-            
-            _ping = new TaskCompletionSource<PingMessage>();
-            await _clientWebSocket.SendAsync(Encoding.Default.GetBytes(ping), WebSocketMessageType.Text, true, CancellationToken.None);
-
-            if (await Task.WhenAny(_ping.Task, Task.Delay(10000)) == _ping.Task)
-                return _ping.Task.Result;
+        
+            _pingResponseMessage = new TaskCompletionSource<PingMessage>();
+            _clientWebSocket.Send(ping);
+        
+            if (await Task.WhenAny(_pingResponseMessage.Task, Task.Delay(10000)) == _pingResponseMessage.Task)
+                return _pingResponseMessage.Task.Result;
             else
                 throw new NanoWebSocketException("Ping timeout exceeded.");
         }
 
-        public async Task Subscribe(Topic topic)
+        public void Subscribe(Topic topic)
         {
-            if (_loop.IsCompleted)
-                throw new Exception("This websocket instance has been closed and therefore no subscriptions can't be made.");
-
-            await _clientWebSocket.SendAsync(Encoding.Default.GetBytes(topic.GetSubscribeCommand()), WebSocketMessageType.Text, true, CancellationToken.None);
+            _subscriptions.Add(topic);
+            _clientWebSocket.Send(topic.GetSubscribeCommand());
         }
     }
 }

@@ -10,12 +10,12 @@ namespace Nano.Net.Tests
         
         public async Task InitializeAsync()
         {
-            Client = await NanoWebSocketClient.Connect(Constants.WebSocketAddress);
+            Client = new NanoWebSocketClient(Constants.WebSocketAddress);
+            await Client.Start();
         }
 
         public async Task DisposeAsync()
         {
-            await Client.Stop();
         }
     }
 
