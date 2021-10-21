@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.WebSockets;
 using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
@@ -9,7 +10,7 @@ using Websocket.Client;
 
 namespace Nano.Net.WebSockets
 {
-    public class NanoWebSocketClient
+    public class NanoWebSocketClient : IDisposable
     {
         public delegate void MessageReceivedEventHandler(NanoWebSocketClient client, string content);
 
@@ -31,29 +32,47 @@ namespace Nano.Net.WebSockets
         /// Invoked when a new unconfirmed block message is received.
         /// </summary>
         public event UnconfirmedBlockMessageHandler NewUnconfirmedBlock;
+        
+        /// <summary>
+        /// Returns a copy of this client's subscriptions.
+        /// </summary>
+        public Topic[] Subscriptions => _subscriptions.Select(x => x.Value).ToArray();
 
         private readonly Dictionary<string, Topic> _subscriptions = new Dictionary<string, Topic>();
         private readonly WebsocketClient _clientWebSocket;
         private TaskCompletionSource<PingMessage> _pingResponseMessage;
+        private double _timeout;
+        private bool _isDisposed = false;
 
         /// <summary>
         /// Creates a new websocket connection to the specified node address. Needs to be started using the Start() method.
         /// Note: not all public nodes have their websockets enabled. 
         /// </summary>
         /// <param name="url">The websocket address</param>
-        /// <param name="timeoutInSeconds">For how long the client waits for a message before attempting to reconnect</param>
+        /// <param name="timeoutInSeconds">Optional. For how long the client waits for a message before attempting to reconnect</param>
         public NanoWebSocketClient(string url, double timeoutInSeconds = 20D)
         {
             _clientWebSocket = new WebsocketClient(new Uri(url));
-
-            _clientWebSocket.ReconnectTimeout = TimeSpan.FromSeconds(timeoutInSeconds);
-            _clientWebSocket.MessageReceived.Subscribe(c => OnMessage(c));
-            _clientWebSocket.ReconnectionHappened.Subscribe(_ => OnReconnect());
+            _timeout = timeoutInSeconds;
         }
-
+        
+        /// <summary>
+        /// Starts listening for incoming messages.
+        /// </summary>
         public async Task Start()
         {
+            _clientWebSocket.ReconnectTimeout = TimeSpan.FromSeconds(_timeout);
+            _clientWebSocket.MessageReceived.Subscribe(c => OnMessage(c));
+            _clientWebSocket.ReconnectionHappened.Subscribe(_ => OnReconnect());
+            
             await _clientWebSocket.Start();
+            PingLoop();
+        }
+
+        public async Task Stop()
+        {
+            if (_clientWebSocket.IsStarted)
+                await _clientWebSocket.Stop(WebSocketCloseStatus.NormalClosure, string.Empty);
         }
 
         private void OnMessage(ResponseMessage message)
@@ -62,9 +81,9 @@ namespace Nano.Net.WebSockets
             var messageJson = JObject.Parse(messageString);
 
             // listen for ping responses
-            if (_pingResponseMessage is not null && messageJson["ack"]?.ToString() == "pong")
+            if (messageJson["ack"]?.ToString() == "pong")
             {
-                _pingResponseMessage.TrySetResult(JsonConvert.DeserializeObject<PingMessage>(messageString));
+                _pingResponseMessage?.TrySetResult(JsonConvert.DeserializeObject<PingMessage>(messageString));
                 return;
             }
 
@@ -90,8 +109,24 @@ namespace Nano.Net.WebSockets
 
         private void OnReconnect()
         {
+            if (!_clientWebSocket.IsStarted)
+                return;
+            
             foreach ((string _, Topic topic) in _subscriptions)
                 SendSubscription(topic);
+        }
+        
+        /// <summary>
+        /// This sends a ping message every clientTimeout/2 seconds to prevent the reconnection timeout from running when not many messages are being received,
+        /// even though the connection is fine.
+        /// </summary>
+        private async void PingLoop()
+        {
+            while (!_isDisposed)
+            {
+                _clientWebSocket.Send("{ \"action\": \"ping\" }");
+                await Task.Delay((int) _timeout / 2);
+            }
         }
         
         private void SendSubscription(Topic topic)
@@ -132,6 +167,12 @@ namespace Nano.Net.WebSockets
                 Topic = topic.Name,
                 Options = topic.GetOptions()
             }, Topic.JsonSerializerSettings));
+        }
+
+        public void Dispose()
+        {
+            _clientWebSocket?.Dispose();
+            _isDisposed = true;
         }
     }
 }
