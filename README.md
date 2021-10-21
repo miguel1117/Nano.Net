@@ -10,6 +10,7 @@ Still in development. Please feel free to submit any changes, bugfixes or new fe
 * [x] Unit conversion
 * [x] RPC client for interacting with the network
 * [x] Banano support
+* [x] WebSockets support
 * [ ] Good documentation
 
 ## Requirements
@@ -19,8 +20,9 @@ Still in development. Please feel free to submit any changes, bugfixes or new fe
 ## Installation
 You can either:
 * Install the package [from Nuget](https://www.nuget.org/packages/Nano.Net/)
-* Build the project and copy the binaries to your project
-* If your project targets .NET Core then the C# version should be set to version 9 in the .csproj file. Example: 
+* Build the project and copy the binaries to your project 
+ 
+Note: If your project targets .NET Core then the C# version should be set to version 9 in the .csproj file. Example: 
 ```xml
 <PropertyGroup>
 	<LangVersion>9.0</LangVersion>
@@ -93,6 +95,23 @@ var receiveBlock = Block.CreateReceiveBlock(account, "PENDING_BLOCK_HASH", Amoun
 await rpcClient.ProcessAsync(receiveBlock);
 ```
 
+**WebSockets usage**
+```c#
+// Connect to a websocket enpoint.
+var w = new NanoWebSocketClient("NODE_ADDRESS");
+
+// Subscribe to a topic. Some topics may have options. Topics can be found in the WebsSockets/Topics directory.
+w.Subscribe(new ConfirmationTopic());
+
+// Subscribe to the catch-all event, which will send messages for all topics the client receives.
+w.Message += (client, content) => { Console.WriteLine(content); };
+
+// Subscribe to the Confirmation topic event.
+w.Confirmation += (client, message) => { Console.WriteLine(message.Message.Amount); };
+
+// Don't forget to run Start() to actually start receiving the messages.
+await w.Start();
+```
 
 ## Acknowledgements
 * [NanoDotNet](https://github.com/Flufd/NanoDotNet) for bits of code, including the Nano base32 implementation
