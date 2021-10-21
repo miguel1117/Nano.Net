@@ -6,7 +6,7 @@ namespace Nano.Net.WebSockets
 {
     public abstract class Topic
     {
-        protected static readonly JsonSerializerSettings JsonSerializerSettings = new JsonSerializerSettings
+        public static readonly JsonSerializerSettings JsonSerializerSettings = new JsonSerializerSettings
         {
             NullValueHandling = NullValueHandling.Ignore,
             ContractResolver = new DefaultContractResolver()
@@ -14,7 +14,9 @@ namespace Nano.Net.WebSockets
                 NamingStrategy = new SnakeCaseNamingStrategy()
             }
         };
+        
+        public abstract string Name { get; }
 
-        public abstract string GetSubscribeCommand();
+        public abstract object GetOptions();
     }
 }

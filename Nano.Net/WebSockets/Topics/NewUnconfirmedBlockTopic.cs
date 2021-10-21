@@ -4,13 +4,11 @@ namespace Nano.Net.WebSockets
 {
     public class NewUnconfirmedBlockTopic : Topic
     {
-        public override string GetSubscribeCommand()
+        public override string Name => "new_unconfirmed_block";
+
+        public override object GetOptions()
         {
-            return JsonConvert.SerializeObject(new
-            {
-                Action = "subscribe",
-                Topic = "new_unconfirmed_block"
-            });
+            return null;
         }
     }
 }

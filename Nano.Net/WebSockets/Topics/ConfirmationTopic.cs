@@ -4,6 +4,8 @@ namespace Nano.Net.WebSockets
 {
     public class ConfirmationTopic : Topic
     {
+        public override string Name => "confirmation";
+        
         public string ConfirmationType { get; set; }
         public string[] Accounts { get; set; }
         public bool? IncludeBlock { get; set; }
@@ -21,14 +23,12 @@ namespace Nano.Net.WebSockets
             IncludeElectionInfo = includeElectionInfo;
         }
 
-        public override string GetSubscribeCommand()
+        public override object GetOptions()
         {
-            return JsonConvert.SerializeObject(new
+            return new
             {
-                Action = "subscribe",
-                Topic = "confirmation",
-                Options = new { ConfirmationType, Accounts, IncludeBlock, IncludeElectionInfo }
-            }, JsonSerializerSettings);
+                ConfirmationType, Accounts, IncludeBlock, IncludeElectionInfo
+            };
         }
     }
 }
