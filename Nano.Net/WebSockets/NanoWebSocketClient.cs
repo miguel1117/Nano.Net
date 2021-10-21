@@ -113,7 +113,7 @@ namespace Nano.Net.WebSockets
                 return;
             
             foreach ((string _, Topic topic) in _subscriptions)
-                SendSubscription(topic);
+                SendTopic("subscribe", topic);
         }
         
         /// <summary>
@@ -129,14 +129,16 @@ namespace Nano.Net.WebSockets
             }
         }
         
-        private void SendSubscription(Topic topic)
+        private void SendTopic(string action, Topic topic)
         {
-            _clientWebSocket.Send(JsonConvert.SerializeObject(new
+            string request = JsonConvert.SerializeObject(new
             {
-                Action = "subscribe",
+                Action = action,
                 Topic = topic.Name,
                 Options = topic.GetOptions()
-            }, Topic.JsonSerializerSettings));
+            }, Topic.JsonSerializerSettings);
+            
+            _clientWebSocket.Send(request);
         }
 
         // maybe there is a better way to do this, but i just can't imagine any right now
@@ -157,19 +159,13 @@ namespace Nano.Net.WebSockets
         public void Subscribe(Topic topic)
         {
             _subscriptions[topic.Name] = topic;
-            SendSubscription(topic);
+            SendTopic("subscribe", topic);
         }
-
+        
         public void UpdateSubscription(Topic topic)
         {
             _subscriptions[topic.Name] = topic;
-            
-            _clientWebSocket.Send(JsonConvert.SerializeObject(new
-            {
-                Action = "update",
-                Topic = topic.Name,
-                Options = topic.GetOptions()
-            }, Topic.JsonSerializerSettings));
+            SendTopic("update", topic);
         }
 
         public void Dispose()

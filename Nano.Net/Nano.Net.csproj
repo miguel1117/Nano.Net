@@ -9,7 +9,7 @@
         <PackageLicenseUrl>https://github.com/miguel1117/Nano.Net/blob/master/LICENSE</PackageLicenseUrl>
         <RepositoryUrl>https://github.com/miguel1117/Nano.Net</RepositoryUrl>
         <TargetFrameworks>net5.0;netcoreapp3.1</TargetFrameworks>
-        <PackageVersion>1.1.0</PackageVersion>
+        <PackageVersion>1.3.2</PackageVersion>
     </PropertyGroup>
 
     <ItemGroup>
