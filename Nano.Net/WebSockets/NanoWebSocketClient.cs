@@ -142,6 +142,9 @@ namespace Nano.Net.WebSockets
         // maybe there is a better way to do this, but i just can't imagine any right now
         public async Task<PingMessage> Ping()
         {
+            if (!_clientWebSocket.IsStarted)
+                throw new NanoWebSocketException("This client hasn't been started yet.");
+            
             _pingResponseMessage = new TaskCompletionSource<PingMessage>();
             _clientWebSocket.Send("{ \"action\": \"ping\" }");
 
