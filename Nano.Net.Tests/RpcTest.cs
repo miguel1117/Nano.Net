@@ -60,7 +60,7 @@ namespace Nano.Net.Tests
         [Fact]
         public async void AccountsPendingTest()
         {
-            AccountsPendingResponse accountsPendingResponse = await _rpcClient.AccountsPendingAsync(new string[] { Constants.ReferenceAccount, "nano_3argubuqp9yznnqq767dp58zd9s8a3po897a7zsy5fssz81bmsa7bcd33u36" });
+            AccountsPendingResponse accountsPendingResponse = await _rpcClient.AccountsPendingAsync(new string[] { Constants.ReferenceAccount });
             
             Assert.NotNull(accountsPendingResponse.Blocks[Constants.ReferenceAccount].First().Value.Amount);
             Assert.NotNull(accountsPendingResponse.Blocks[Constants.ReferenceAccount].First().Value.Source);
