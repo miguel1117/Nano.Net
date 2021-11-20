@@ -197,10 +197,11 @@ namespace Nano.Net
 
             foreach (var address in receivableBlocks.Blocks)
             {
+                if (address.Value is null)
+                    continue;
+                
                 foreach (var block in address.Value)
-                {
                     block.Value.Hash = block.Key;
-                }
             }
 
             return receivableBlocks;
