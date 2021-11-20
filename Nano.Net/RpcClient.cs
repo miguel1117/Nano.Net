@@ -182,6 +182,30 @@ namespace Nano.Net
             });
         }
 
+        /// <summary>
+        /// Returns a list of confirmed block hashes which have not yet been received by these accounts 
+        /// </summary>
+        public async Task<AccountsPendingResponse> AccountsPendingAsync(string[] accounts, int count = 5)
+        {
+            var receivableBlocks =  await RpcRequestAsync<AccountsPendingResponse>(new
+            {
+                Action = "accounts_pending",
+                Accounts = accounts,
+                Source = true,
+                Count = count
+            });
+
+            foreach (var address in receivableBlocks.Blocks)
+            {
+                foreach (var block in address.Value)
+                {
+                    block.Value.Hash = block.Key;
+                }
+            }
+
+            return receivableBlocks;
+        }
+
         // Custom calls
 
         /// <summary>
