@@ -57,6 +57,16 @@ namespace Nano.Net.Tests
         }
 
         [Fact]
+        public async void AccountsPendingTest()
+        {
+            AccountsPendingResponse accountsPendingsResponse = await _rpcClient.AccountsPendingAsync(new string[] { Constants.ReferenceAccount });
+            
+            Assert.Equal("7729958CDF96F7B4627FC37725CAD7661165E97AA2AE1A4789984FF2F8245EFF", accountsPendingsResponse.Blocks[Constants.ReferenceAccount][0]);
+            Assert.Equal("E1D6E04A3BC2C00A6E7F282ACC84C622E1A4C9B8BDBB087E73496CF8999E5494", accountsPendingsResponse.Blocks[Constants.ReferenceAccount][1]);
+            Assert.Equal("FA8FB9368F1C99FD0937A8383184A43B831463521EC8C90C3A524840964F3AC1", accountsPendingsResponse.Blocks[Constants.ReferenceAccount][2]);
+        }
+
+        [Fact]
         public async void BlockInfoTest()
         {
             BlockInfoResponse blockInfoResponse = await _rpcClient.BlockInfoAsync("75F0B821DE3B25908755520117660E1297DDEA774DEC817FAA2C27221442403A");
