@@ -6,6 +6,6 @@ namespace Nano.Net
     public class AccountsPendingResponse
     {
         [JsonProperty("blocks")]
-        public Dictionary<string, string[]> Blocks { get; set; }
+        public Dictionary<string, Dictionary<string, ReceivableBlock>> Blocks { get; set; }
     }
 }

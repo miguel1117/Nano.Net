@@ -187,12 +187,23 @@ namespace Nano.Net
         /// </summary>
         public async Task<AccountsPendingResponse> AccountsPendingAsync(string[] accounts, int count = 5)
         {
-            return await RpcRequestAsync<AccountsPendingResponse>(new
+            var receivableBlocks =  await RpcRequestAsync<AccountsPendingResponse>(new
             {
                 Action = "accounts_pending",
                 Accounts = accounts,
+                Source = true,
                 Count = count
             });
+
+            foreach (var address in receivableBlocks.Blocks)
+            {
+                foreach (var block in address.Value)
+                {
+                    block.Value.Hash = block.Key;
+                }
+            }
+
+            return receivableBlocks;
         }
 
         // Custom calls
