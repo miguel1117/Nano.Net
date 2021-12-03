@@ -41,7 +41,8 @@ namespace Nano.Net.WebSockets
         private readonly Dictionary<string, Topic> _subscriptions = new Dictionary<string, Topic>();
         private readonly WebsocketClient _clientWebSocket;
         private TaskCompletionSource<PingMessage> _pingResponseMessage;
-        private double _timeout;
+        private TimeSpan _reconnectTimeout;
+        private TimeSpan _pingInterval;
         private bool _isDisposed = false;
 
         /// <summary>
@@ -49,11 +50,13 @@ namespace Nano.Net.WebSockets
         /// Note: not all public nodes have their websockets enabled. 
         /// </summary>
         /// <param name="url">The websocket address</param>
-        /// <param name="timeoutInSeconds">Optional. For how long the client waits for a message before attempting to reconnect</param>
-        public NanoWebSocketClient(string url, double timeoutInSeconds = 20D)
+        /// <param name="reconnectTimeoutSeconds">Optional. For how long the client waits for a message before attempting to reconnect</param>
+        /// <param name="pingIntervalSeconds">Optional. Time interval client ping websocket service</param>
+        public NanoWebSocketClient(string url, double reconnectTimeoutSeconds = 20, double pingIntervalSeconds = 10)
         {
             _clientWebSocket = new WebsocketClient(new Uri(url));
-            _timeout = timeoutInSeconds;
+            _reconnectTimeout = TimeSpan.FromSeconds(reconnectTimeoutSeconds);
+            _pingInterval = TimeSpan.FromSeconds(pingIntervalSeconds);
         }
         
         /// <summary>
@@ -61,7 +64,7 @@ namespace Nano.Net.WebSockets
         /// </summary>
         public async Task Start()
         {
-            _clientWebSocket.ReconnectTimeout = TimeSpan.FromSeconds(_timeout);
+            _clientWebSocket.ReconnectTimeout = _reconnectTimeout;
             _clientWebSocket.MessageReceived.Subscribe(c => OnMessage(c));
             _clientWebSocket.ReconnectionHappened.Subscribe(_ => OnReconnect());
             
@@ -125,7 +128,7 @@ namespace Nano.Net.WebSockets
             while (!_isDisposed)
             {
                 _clientWebSocket.Send("{ \"action\": \"ping\" }");
-                await Task.Delay((int) _timeout / 2);
+                await Task.Delay(_pingInterval);
             }
         }
         
