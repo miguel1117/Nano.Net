@@ -1,6 +1,7 @@
 # Nano.Net
 A .NET library for [Nano](https://nano.org).
 Still in development. Please feel free to submit any changes, bugfixes or new features with pull requests.
+This library follows Semantic Versioning.
 
 
 ## Features/Roadmap
@@ -14,15 +15,14 @@ Still in development. Please feel free to submit any changes, bugfixes or new fe
 * [ ] Good documentation
 
 ## Requirements
-* .NET 5.0 or .NET Core 3.1
-* C# 9
+* .NET Core 3.1 or .NET 5 and higher
 
 ## Installation
 You can either:
 * Install the package [from Nuget](https://www.nuget.org/packages/Nano.Net/)
 * Build the project and copy the binaries to your project 
  
-Note: If your project targets .NET Core then the C# version should be set to version 9 in the .csproj file. Example: 
+Note: If your project targets .NET Core then the C# version should be explicitly set to version 9 in the .csproj file. Example: 
 ```xml
 <PropertyGroup>
 	<LangVersion>9.0</LangVersion>
