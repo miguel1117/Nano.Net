@@ -96,6 +96,8 @@ await rpcClient.ProcessAsync(receiveBlock);
 ```
 
 **WebSockets usage**
+* Note: if you're using a public node you should be aware that some of them behave differently than the "vanilla" nano node behaviour.
+Because of this, NanoWebSocketClient may not work as expected in some cases, due to those differences.
 ```c#
 // Connect to a websocket enpoint.
 var w = new NanoWebSocketClient("NODE_ADDRESS");

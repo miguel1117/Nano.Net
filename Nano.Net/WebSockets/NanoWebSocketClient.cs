@@ -96,7 +96,7 @@ namespace Nano.Net.WebSockets
             switch (topic)
             {
                 case null:
-                    throw new NanoWebSocketException("NanoWebSocketClient received unexpected message.");
+                    return;
 
                 case "confirmation":
                     var confirmationMessage = JsonConvert.DeserializeObject<ConfirmationTopicMessage>(messageString);
