@@ -31,8 +31,11 @@ namespace Nano.Net.Tests
         [Fact]
         public async void PingTest()
         {
-            PingMessage ping = await _fixture.Client.Ping();
-            Assert.NotNull(ping.Time);
+            var client = new NanoWebSocketClient(Constants.WebSocketAddress);
+            await client.Start();
+            
+            PingMessage ping = await client.Ping();
+            Assert.NotNull(ping.Ack);
         }
     }
 }
