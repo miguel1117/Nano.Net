@@ -6,7 +6,7 @@ namespace Nano.Net.Tests
 {
     public class RpcTest
     {
-        private readonly RpcClient _rpcClient = new RpcClient(Constants.NodeAddress);
+        private readonly RpcClient _rpcClient = new RpcClient(Constants.RpcAddress);
 
         [Fact]
         public async void UpdateAccountInfoTest()
