@@ -7,6 +7,7 @@ namespace Nano.Net.Tests
     public class RpcTest
     {
         private readonly RpcClient _rpcClient = new RpcClient(Constants.RpcAddress);
+        private const string TestAccountPrivateKey = "0000000000000000000000000000000000000000000000000000000000000000";
 
         [Fact]
         public async void UpdateAccountInfoTest()
@@ -61,7 +62,7 @@ namespace Nano.Net.Tests
         public async void AccountsPendingTest()
         {
             AccountsPendingResponse accountsPendingResponse = await _rpcClient.AccountsPendingAsync(new string[] { Constants.ReferenceAccount });
-            
+
             Assert.NotNull(accountsPendingResponse.Blocks[Constants.ReferenceAccount].First().Value.Amount);
             Assert.NotNull(accountsPendingResponse.Blocks[Constants.ReferenceAccount].First().Value.Source);
         }
@@ -75,36 +76,38 @@ namespace Nano.Net.Tests
             Assert.Equal("nano_1iuz18n4g4wfp9gf7p1s8qkygxw7wx9qfjq6a9aq68uyrdnningdcjontgar", blockInfoResponse.Content.Representative);
         }
 
-        [Fact]
+        [Fact(Skip = "This test requires a RPC with the work generation feature enabled.")]
         public async void WorkGenerateTest()
         {
-            /*const string hash = "3865BFCD423CE3579C4A7C6010CE763BE4C63964AC06BDA451A63BBCAC9E3712";
-            WorkGenerateResponse workGenerate = await _rpcClient.WorkGenerateAsync(hash);
+            const string exampleFrontier = "7B58BB18E887F5146DD46ACAD89E5139D363F5F4A50DE9A0B465217A51D1BFDF";
+            var rpcClient = new RpcClient("http://localhost:7076");
+            var workResponse = await rpcClient.WorkGenerateAsync(exampleFrontier);
 
-            Assert.Equal(hash, workGenerate.Hash);
-            Assert.NotNull(workGenerate.Work);*/
+            Assert.NotNull(workResponse.Work);
         }
 
-        [Fact]
+        [Fact(Skip = "This test needs to be setup manually.")]
         public async void SendBlockTest()
         {
-            /*Account account = Account.FromPrivateKey();
+            var account = new Account(privateKey: TestAccountPrivateKey);
             await _rpcClient.UpdateAccountAsync(account);
-            
-            var block = Block.CreateSendBlock();
 
-            await _rpcClient.ProcessAsync(block);*/
+            var block = Block.CreateSendBlock(account, new Account().Address, account.Balance, "0000000000000000");
+            var response = await _rpcClient.ProcessAsync(block);
+            
+            Assert.NotNull(response.Hash);
         }
 
-        [Fact]
+        [Fact(Skip = "This test needs to be setup manually.")]
         public async void ReceiveBlockTest()
         {
-            /*Account account = Account.FromPrivateKey();
+            var account = new Account(privateKey: TestAccountPrivateKey);
             await _rpcClient.UpdateAccountAsync(account);
-            
-            var block = Block.CreateReceiveBlock();
 
-            await _rpcClient.ProcessAsync(block);*/
+            var block = Block.CreateReceiveBlock(account, "0000000000000000000000000000000000000000000000000000000000000000", Amount.FromRaw("0"), "0000000000000000");
+            var response = await _rpcClient.ProcessAsync(block);
+            
+            Assert.NotNull(response.Hash);
         }
     }
 }
