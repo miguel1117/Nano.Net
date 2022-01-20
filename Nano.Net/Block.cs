@@ -110,7 +110,7 @@ namespace Nano.Net
                 Previous = account.Frontier,
                 Representative = representativeAddress,
                 Balance = account.Balance.Raw.ToString("0"),
-                Link = new string('0', 32),
+                Link = new string('0', 64),
                 Work = powNonce,
                 Subtype = BlockSubtype.Change
             };
