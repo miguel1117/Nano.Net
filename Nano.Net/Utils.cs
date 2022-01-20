@@ -114,18 +114,22 @@ namespace Nano.Net
             return hasher.Finish();
         }
 
-        public static byte[] DerivePrivateKey(string seed, uint index)
+        public static byte[] DerivePrivateKey(byte[] seed, uint index)
         {
-            if (seed.Length != 64)
+            if (seed.Length != 32)
                 throw new ArgumentException("A Nano seed should consist of 64 hex characters.");
 
             byte[] indexBytes = BitConverter.GetBytes(index);
             if (BitConverter.IsLittleEndian)
                 indexBytes = indexBytes.Reverse().ToArray();
 
-            byte[] seedBytes = HexToBytes(seed);
-
-            return Blake2BHash(32, seedBytes, indexBytes);
+            return Blake2BHash(32, seed, indexBytes);
+        }
+        
+        [Obsolete]
+        public static byte[] DerivePrivateKey(string seed, uint index) // this only exists to keep the API backwards compatible, since this used to be the original method
+        {
+            return DerivePrivateKey(HexToBytes(seed), index);
         }
 
         public static byte[] PublicKeyFromPrivateKey(byte[] privateKey)
