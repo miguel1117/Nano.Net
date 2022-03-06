@@ -1,4 +1,5 @@
 ﻿using System;
+using Nano.Net.Extensions;
 using Xunit;
 using static Nano.Net.Utils;
 
@@ -14,9 +15,8 @@ namespace Nano.Net.Tests
         [Fact]
         public void HexToBytesTest()
         {
-            HexToBytes("ABcd");
-            Assert.Throws<ArgumentException>(() => HexToBytes("ABCDE")); // invalid hex string size, must be a multiple of 2
-            Assert.Throws<ArgumentException>(() => HexToBytes("ABCK")); // invalid hex characters
+            "ABcd".HexToBytes();
+            Assert.Throws<ArgumentException>(() => "ABCDE".HexToBytes()); // invalid hex string size, must be a multiple of 2
         }
 
         [Fact]
@@ -25,11 +25,11 @@ namespace Nano.Net.Tests
             Assert.Throws<ArgumentException>(() => DerivePrivateKey(string.Empty, 0));
 
             Assert.Equal("A066701E0641E524662E3B7F67F98A248C300017BAA8AA0D91A95A2BCAF8D4D8",
-                BytesToHex(DerivePrivateKey(Seed, 0)),
+                DerivePrivateKey(Seed, 0).BytesToHex(),
                 true);
 
             Assert.Equal("814CE3DB9F40AB48537D342E3FE34B8954A6A351FD89D0D5A5EFD2A25019FE04",
-                BytesToHex(DerivePrivateKey(Seed, 468)),
+                DerivePrivateKey(Seed, 468).BytesToHex(),
                 true);
         }
 
@@ -37,7 +37,7 @@ namespace Nano.Net.Tests
         public void PublicKeyFromPrivateKeyTest()
         {
             Assert.Equal(FirstPublicKey,
-                BytesToHex(PublicKeyFromPrivateKey(HexToBytes(FirstPrivateKey))),
+                PublicKeyFromPrivateKey(FirstPrivateKey.HexToBytes()).BytesToHex(),
                 true);
         }
 
@@ -45,16 +45,14 @@ namespace Nano.Net.Tests
         public void AddressFromPublicKeyTest()
         {
             Assert.Equal(FirstAddress,
-                AddressFromPublicKey(HexToBytes(FirstPublicKey), "nano"),
+                AddressFromPublicKey(FirstPublicKey.HexToBytes()),
                 true);
         }
 
         [Fact]
         public void PublicKeyFromAddressTest()
         {
-            Assert.Equal(FirstPublicKey,
-                BytesToHex(PublicKeyFromAddress(FirstAddress)),
-                true);
+            Assert.Equal(FirstPublicKey, PublicKeyFromAddress(FirstAddress).BytesToHex(), true);
         }
 
         [Fact]

@@ -6,6 +6,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using Blake2Sharp;
 using Chaos.NaCl;
+using Nano.Net.Extensions;
 
 namespace Nano.Net
 {
@@ -28,28 +29,17 @@ namespace Nano.Net
                 NanoAddressDecoding[Convert.ToString(i, 2).PadLeft(5, '0')] = c;
             }
         }
-
+        
+        [Obsolete("Use the provided extension methods instead.")]
         public static byte[] HexToBytes(string hex)
         {
-            if (hex.Length % 2 != 0)
-                throw new ArgumentException("Hex string length isn't valid.");
-
-            if (!Regex.IsMatch(hex, @"^(?i)[0-9A-F]+$"))
-                throw new ArgumentException("Invalid hex characters.");
-
-            return Enumerable.Range(0, hex.Length)
-                .Where(x => x % 2 == 0)
-                .Select(x => Convert.ToByte(hex.Substring(x, 2), 16))
-                .ToArray();
+            return hex.HexToBytes();
         }
-
+        
+        [Obsolete("Use the provided extension methods instead.")]
         public static string BytesToHex(byte[] bytes)
         {
-            var hex = new StringBuilder(bytes.Length * 2);
-            foreach (byte b in bytes)
-                hex.AppendFormat("{0:x2}", b);
-
-            return hex.ToString().ToUpper();
+            return bytes.BytesToHex();
         }
 
         public static string GenerateSeed()
@@ -59,7 +49,7 @@ namespace Nano.Net
             var rngCryptoServiceProvider = new RNGCryptoServiceProvider();
             rngCryptoServiceProvider.GetBytes(seed);
 
-            return BytesToHex(seed);
+            return seed.BytesToHex();
         }
 
         private static string EncodeNanoBase32(byte[] data, bool padZeros = true)
@@ -185,11 +175,11 @@ namespace Nano.Net
         // this could probably be made more efficient and it also needs more testing
         public static bool IsWorkValid(string hash, string powNonce, string threshold = null)
         {
-            byte[] thresholdBytes = threshold is null ? HexToBytes("fffffff800000000") : HexToBytes(threshold);
+            byte[] thresholdBytes = threshold is null ? "fffffff800000000".HexToBytes() : threshold.HexToBytes();
             ulong thresholdValue = BitConverter.ToUInt64(thresholdBytes.Reverse().ToArray());
 
-            byte[] hashBytes = HexToBytes(hash);
-            byte[] workBytes = HexToBytes(powNonce).Reverse().ToArray();
+            byte[] hashBytes = hash.HexToBytes();
+            byte[] workBytes = powNonce.HexToBytes().Reverse().ToArray();
 
             byte[] output = Blake2BHash(8, workBytes, hashBytes);
             ulong outputValue = BitConverter.ToUInt64(output);
