@@ -18,6 +18,7 @@ namespace Nano.Net
         static Utils()
         {
             const string nanoAlphabet = "13456789abcdefghijkmnopqrstuwxyz";
+            
             NanoAddressEncoding = new Dictionary<char, string>();
             NanoAddressDecoding = new Dictionary<string, char>();
 
@@ -54,11 +55,12 @@ namespace Nano.Net
 
         private static string EncodeNanoBase32(byte[] data, bool padZeros = true)
         {
-            string binaryString = padZeros ? "0000" : string.Empty;
+            var stringBuilder = new StringBuilder(padZeros ? "0000" : string.Empty);
 
             foreach (byte t in data)
-                binaryString += Convert.ToString(t, 2).PadLeft(8, '0');
+                stringBuilder.Append(Convert.ToString(t, 2).PadLeft(8, '0'));
 
+            var binaryString = stringBuilder.ToString();
             var result = string.Empty;
 
             for (var i = 0; i < binaryString.Length; i += 5)
@@ -72,15 +74,15 @@ namespace Nano.Net
             int prefixIndex = data.IndexOf("_", StringComparison.Ordinal);
 
             if (prefixIndex == -1)
-                throw new ArgumentException("This Nano address isn't valid.");
+                throw new ArgumentException("This address isn't valid.");
 
             data = data.Substring(prefixIndex + 1, 52);
 
-            var binaryString = string.Empty;
+            var stringBuilder = new StringBuilder();
             foreach (char t in data)
-                binaryString += NanoAddressEncoding[t]; // Decode each character into string representation of it's binary parts
+                stringBuilder.Append(NanoAddressEncoding[t]); // Decode each character into string representation of it's binary parts
 
-            binaryString = binaryString[4..]; // Remove leading 4 0s
+            var binaryString = stringBuilder.ToString()[4..]; // Remove leading 4 0s
 
             // Convert to bytes
             var publicKeyBytes = new byte[32];
