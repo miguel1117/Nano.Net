@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Numerics;
 using Chaos.NaCl;
+using Nano.Net.Extensions;
 using Newtonsoft.Json;
 using static Nano.Net.Utils;
 
@@ -130,14 +131,14 @@ namespace Nano.Net
                 new byte[31],
                 new byte[] { 0x6 },
                 PublicKeyFromAddress(Account),
-                HexToBytes(Previous),
+                Previous.HexToBytes(),
                 PublicKeyFromAddress(Representative),
                 new byte[16 - balanceBytes.Length], // pad balance to ensure it is 16 bytes in total
                 balanceBytes,
-                Subtype == BlockSubtype.Send ? PublicKeyFromAddress(Link) : HexToBytes(Link)
+                Subtype == BlockSubtype.Send ? PublicKeyFromAddress(Link) : Link.HexToBytes()
             );
 
-            return BytesToHex(final);
+            return final.BytesToHex();
         }
 
         /// <summary>
@@ -153,9 +154,9 @@ namespace Nano.Net
 
             Ed25519.KeyPairFromSeed(out byte[] _, out byte[] expandedPrivateKey, privateKey);
 
-            byte[] signatureBytes = Ed25519.Sign(HexToBytes(Hash), expandedPrivateKey);
+            byte[] signatureBytes = Ed25519.Sign(Hash.HexToBytes(), expandedPrivateKey);
 
-            Signature = BytesToHex(signatureBytes);
+            Signature = signatureBytes.BytesToHex();
         }
     }
 }

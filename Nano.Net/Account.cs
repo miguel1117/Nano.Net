@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Security.Cryptography;
+using Nano.Net.Extensions;
 using static Nano.Net.Utils;
 
 namespace Nano.Net
@@ -49,7 +50,7 @@ namespace Nano.Net
         /// </summary>
         /// <param name="privateKey">Private key bytes encoded as a hex string.</param>
         /// <param name="prefix">The prefix used for the address (without the "_"). Defaults to nano.</param>
-        public Account(string privateKey, string prefix = "nano") : this(HexToBytes(privateKey), prefix)
+        public Account(string privateKey, string prefix = "nano") : this(privateKey.HexToBytes(), prefix)
         {
         }
         
@@ -72,7 +73,7 @@ namespace Nano.Net
         /// <param name="seed">The seed as a hex string used to derive the private key for this account.</param>
         /// <param name="index">The index used to derive the key.</param>
         /// <param name="prefix">The prefix used for the address (without the "_"). Defaults to nano.</param>
-        public Account(string seed, uint index, string prefix = "nano") : this(HexToBytes(seed), index, prefix)
+        public Account(string seed, uint index, string prefix = "nano") : this(seed.HexToBytes(), index, prefix)
         {
         }
 
