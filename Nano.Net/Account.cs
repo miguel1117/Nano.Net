@@ -20,6 +20,11 @@ namespace Nano.Net
         internal bool MissingInformation => Frontier is null || Balance is null || Representative is null;
 
         /// <summary>
+        /// Create a new Account object with a random private key and the prefix nano.
+        /// </summary>
+        public Account() : this("nano") {}
+        
+        /// <summary>
         /// Create a new Account object with a random private key.
         /// </summary>
         /// <param name="prefix">The prefix used for the address (without the "_"). Defaults to nano.</param>
