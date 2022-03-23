@@ -7,7 +7,7 @@
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <Title>Nano.Net</Title>
-        <PackageVersion>1.4.1</PackageVersion>
+        <PackageVersion>1.4.2</PackageVersion>
         <Description>A .NET library for the Nano cryptocurrency</Description>
         <Copyright>miguel1117</Copyright>
         <PackageProjectUrl>https://github.com/miguel1117/Nano.Net</PackageProjectUrl>
