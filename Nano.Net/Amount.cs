@@ -9,7 +9,7 @@ namespace Nano.Net
     public class Amount
     {
         [DataMember]
-        public BigInteger Raw { get; }
+        public BigInteger Raw { get; init; }
         public BigDecimal Nano => RawToNano(Raw);
 
         private Amount(BigInteger rawAmount)
