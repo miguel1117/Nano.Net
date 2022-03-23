@@ -1,11 +1,14 @@
 ﻿using System.Numerics;
+using System.Runtime.Serialization;
 using Nano.Net.Numbers;
 
 namespace Nano.Net
 {
     // not tested enough
+    [DataContract]
     public class Amount
     {
+        [DataMember]
         public BigInteger Raw { get; }
         public BigDecimal Nano => RawToNano(Raw);
 
