@@ -10,7 +10,7 @@ public class RpcTest
     private const string TestAccountPrivateKey = "0000000000000000000000000000000000000000000000000000000000000000";
 
     [Fact]
-    public async void UpdateAccountInfoTest()
+    public async void AccountInfo_ValidateResult_ValidResult()
     {
         AccountInfoResponse accountInfo = await _rpcClient.AccountInfoAsync(Constants.ReferenceAccount);
 
@@ -20,27 +20,27 @@ public class RpcTest
     }
 
     [Fact]
-    public async void UnopenedAccountTest()
+    public async void AccountInfo_UnopenedAccount_ThrowsException()
     {
         await Assert.ThrowsAsync<UnopenedAccountException>(async () =>
             await _rpcClient.AccountInfoAsync("nano_3cxdogotqcxdogotqcxdogotqcxdogotqcxdogotqcxdogotqcxdqq8mbd6p"));
     }
 
     [Fact]
-    public async void RpcErrorTest()
+    public async void RpcCommand_InvalidCommand_ThrowsException()
     {
         await Assert.ThrowsAsync<RpcException>(async () => await _rpcClient.AccountInfoAsync("0"));
     }
 
     [Fact]
-    public async void PendingBlockTest()
+    public async void PendingBlock_ValidateResult_ValidResult()
     {
         ReceivableBlocksResponse receivableBlocks = await _rpcClient.PendingBlocksAsync(Constants.ReferenceAccount);
         Assert.NotEmpty(receivableBlocks.PendingBlocks);
     }
 
     [Fact]
-    public async void AccountHistoryTest()
+    public async void AccountHistory_ValidateResult_ValidResult()
     {
         AccountHistoryResponse accountHistoryResponse = await _rpcClient.AccountHistoryAsync(Constants.ReferenceAccount);
         HistoryBlock firstBlock = accountHistoryResponse.History[0];
@@ -51,7 +51,7 @@ public class RpcTest
     }
 
     [Fact]
-    public async void AccountsBalanceTest()
+    public async void AccountsBalances_ValidateResult_ValidResult()
     {
         AccountsBalancesResponse accountsBalancesResponse = await _rpcClient.AccountsBalancesAsync(new string[] { Constants.ReferenceAccount });
 
@@ -59,7 +59,7 @@ public class RpcTest
     }
 
     [Fact]
-    public async void AccountsPendingTest()
+    public async void AccountsPending_ValidateResult_ValidResult()
     {
         AccountsPendingResponse accountsPendingResponse = await _rpcClient.AccountsPendingAsync(new string[] { Constants.ReferenceAccount });
 
@@ -68,7 +68,7 @@ public class RpcTest
     }
 
     [Fact]
-    public async void BlockInfoTest()
+    public async void BlockInfo_ValidateResult_ValidResult()
     {
         BlockInfoResponse blockInfoResponse = await _rpcClient.BlockInfoAsync("75F0B821DE3B25908755520117660E1297DDEA774DEC817FAA2C27221442403A");
 
@@ -77,7 +77,7 @@ public class RpcTest
     }
 
     [Fact(Skip = "This test requires a RPC with the work generation feature enabled.")]
-    public async void WorkGenerateTest()
+    public async void WorkGenerate_ValidateResult_ValidResult()
     {
         const string exampleFrontier = "7B58BB18E887F5146DD46ACAD89E5139D363F5F4A50DE9A0B465217A51D1BFDF";
         var rpcClient = new RpcClient("http://localhost:7076");
@@ -87,7 +87,7 @@ public class RpcTest
     }
 
     [Fact(Skip = "This test needs to be setup manually.")]
-    public async void SendBlockTest()
+    public async void Process_SendBlock_ValidateResult()
     {
         var account = new Account(privateKey: TestAccountPrivateKey);
         await _rpcClient.UpdateAccountAsync(account);
@@ -99,7 +99,7 @@ public class RpcTest
     }
 
     [Fact(Skip = "This test needs to be setup manually.")]
-    public async void ReceiveBlockTest()
+    public async void Process_ReceiveBlock_ValidateResult()
     {
         var account = new Account(privateKey: TestAccountPrivateKey);
         await _rpcClient.UpdateAccountAsync(account);

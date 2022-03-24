@@ -29,9 +29,10 @@ public class WebSocketsTest : IClassFixture<WebSocketFixture>
     }
 
     [Fact]
-    public async void PingTest()
+    public async void WebSocketPing_CheckResponse_IsNotNull()
     {
         PingMessage ping = await _fixture.Client.Ping();
+        
         Assert.NotNull(ping.Ack);
     }
 }

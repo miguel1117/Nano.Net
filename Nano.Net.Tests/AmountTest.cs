@@ -6,21 +6,23 @@ namespace Nano.Net.Tests;
 
 public class AmountTest
 {
-    [Fact]
-    public void NanoToRawTest()
+    [Theory]
+    [InlineData("1", "1000000000000000000000000000000")]
+    [InlineData("1.000000000000000000000000000123", "1000000000000000000000000000123")]
+    [InlineData("055.91260", "55912600000000000000000000000000")]
+    [InlineData("0.000000000000000000000000000001", "1")]
+    public void ConvertUnits_NanoToRaw_ValidResult(string rawAmount, string result)
     {
-        Assert.Equal(BigInteger.Parse("1000000000000000000000000000000"), Amount.NanoToRaw("1"));
-        Assert.Equal(BigInteger.Parse("1000000000000000000000000000123"), Amount.NanoToRaw("1.000000000000000000000000000123"));
-        Assert.Equal(BigInteger.Parse("55912600000000000000000000000000"), Amount.NanoToRaw("055.91260"));
-        Assert.Equal(BigInteger.Parse("1"), Amount.NanoToRaw("0.000000000000000000000000000001"));
+        Assert.Equal(BigInteger.Parse(result), Amount.NanoToRaw(rawAmount));
     }
 
-    [Fact]
-    public void RawToNanoTest()
+    [Theory]
+    [InlineData("1000000000000000000000000000000", "1")]
+    [InlineData("1000000000000000000000000000123", "1.000000000000000000000000000123")]
+    [InlineData("55912600000000000000000000000000", "055.91260")]
+    [InlineData("1", "0.000000000000000000000000000001")]
+    public void ConvertUnits_RawToNano_ValidResult(string rawAmount, string result)
     {
-        Assert.Equal(BigDecimal.Parse("1"), Amount.RawToNano("1000000000000000000000000000000"));
-        Assert.Equal(BigDecimal.Parse("1.000000000000000000000000000123"), Amount.RawToNano("1000000000000000000000000000123"));
-        Assert.Equal(BigDecimal.Parse("55.9126"), Amount.RawToNano("55912600000000000000000000000000"));
-        Assert.Equal(BigDecimal.Parse("0.000000000000000000000000000001"), Amount.RawToNano("1"));
+        Assert.Equal(BigDecimal.Parse(result), Amount.RawToNano(rawAmount));
     }
 }
