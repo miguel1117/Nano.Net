@@ -1,47 +1,67 @@
-﻿using System.Numerics;
+﻿using System;
+using System.Numerics;
 using System.Runtime.Serialization;
 using Nano.Net.Numbers;
 
 namespace Nano.Net
 {
-    // not tested enough
     [DataContract]
-    public class Amount
+    public class Amount : IEquatable<Amount>
     {
         [DataMember]
-        public BigInteger Raw { get; init; }
+        public BigInteger Raw { get; }
         public BigDecimal Nano => RawToNano(Raw);
 
-        private Amount(BigInteger rawAmount)
+        public Amount(BigInteger rawAmount)
         {
             Raw = rawAmount;
         }
 
+        public static Amount operator +(Amount a, Amount b)
+        {
+            return new Amount(a.Raw + b.Raw);
+        }
+        
+        public static Amount operator -(Amount a, Amount b)
+        {
+            return new Amount(a.Raw - b.Raw);
+        }
+
+        public static bool operator ==(Amount a, Amount b)
+        {
+            if (a is null && b is null)
+                return true;
+            else if (a is null)
+                return false;
+            else
+                return a.Equals(b);
+        }
+        
+        public static bool operator !=(Amount a, Amount b)
+        {
+            return !(a == b);
+        }
+
         /// <summary>
-        /// Get amount from raw value
+        /// Creates a new Amount object from an amount in raw.
         /// </summary>
-        /// <param name="rawAmount">Raw amount as string</param>
-        /// <returns></returns>
         public static Amount FromRaw(string rawAmount)
         {
             return new Amount(BigInteger.Parse(rawAmount));
         }
 
         /// <summary>
-        /// Get Amount from Nano value
+        /// Creates a new Amount object from an amount in nano.
         /// </summary>
         /// <param name="nanoAmount">Nano amount as string</param>
-        /// <returns></returns>
         public static Amount FromNano(string nanoAmount)
         {
             return new Amount(NanoToRaw(nanoAmount));
         }
 
         /// <summary>
-        /// Convert raw to Nano
+        /// Converts raw to nano.
         /// </summary>
-        /// <param name="rawAmount">Raw</param>
-        /// <returns></returns>
         public static BigDecimal RawToNano(BigInteger rawAmount)
         {
             var raw = (BigDecimal) rawAmount;
@@ -51,20 +71,16 @@ namespace Nano.Net
         }
 
         /// <summary>
-        /// Convert raw to Nano
+        /// Converts raw to nano.
         /// </summary>
-        /// <param name="rawAmount">Raw</param>
-        /// <returns></returns>
         public static BigDecimal RawToNano(string rawAmount)
         {
             return RawToNano(BigInteger.Parse(rawAmount));
         }
 
         /// <summary>
-        /// Convert Nano to raw
+        /// Converts nano to raw.
         /// </summary>
-        /// <param name="nanoAmount"></param>
-        /// <returns></returns>
         public static BigInteger NanoToRaw(BigDecimal nanoAmount)
         {
             var toRaw = BigDecimal.Parse("1000000000000000000000000000000");
@@ -73,10 +89,8 @@ namespace Nano.Net
         }
 
         /// <summary>
-        /// Convert Nano to raw
+        /// Converts nano to raw.
         /// </summary>
-        /// <param name="nanoAmount"></param>
-        /// <returns></returns>
         public static BigInteger NanoToRaw(string nanoAmount)
         {
             return NanoToRaw(BigDecimal.Parse(nanoAmount));
@@ -85,6 +99,33 @@ namespace Nano.Net
         public override string ToString()
         {
             return Raw.ToString();
+        }
+
+        public bool Equals(Amount other)
+        {
+            if (ReferenceEquals(null, other))
+                return false;
+            if (ReferenceEquals(this, other)) 
+                return true;
+            
+            return Raw == other.Raw;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) 
+                return false;
+            if (ReferenceEquals(this, obj)) 
+                return true;
+            if (obj.GetType() != GetType())
+                return false;
+            
+            return Equals((Amount) obj);
+        }
+
+        public override int GetHashCode()
+        {
+            return Raw.GetHashCode();
         }
     }
 }

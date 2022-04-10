@@ -25,4 +25,30 @@ public class AmountTest
     {
         Assert.Equal(BigDecimal.Parse(result), Amount.RawToNano(rawAmount));
     }
+    
+    [Theory]
+    [InlineData(1000453, 3573521, 4573974)]
+    public void AmountMath_Sum_ValidResult(BigInteger a, BigInteger b, BigInteger result)
+    {
+        Assert.Equal(result, (new Amount(a) + new Amount(b)).Raw);
+    }
+    
+    [Theory]
+    [InlineData(4573974, 3573521, 1000453)]
+    public void AmountMath_Subtract_ValidResult(BigInteger a, BigInteger b, BigInteger result)
+    {
+        Assert.Equal(result, (new Amount(a) - new Amount(b)).Raw);
+    }
+
+    [Fact]
+    public void AmountComparison_SameValue_Equal()
+    {
+        Assert.True(new Amount(15) == new Amount(15));
+    }
+    
+    [Fact]
+    public void AmountComparison_DifferentValues_Different()
+    {
+        Assert.True(new Amount(15) != new Amount(25));
+    }
 }
