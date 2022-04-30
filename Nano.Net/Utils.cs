@@ -174,11 +174,21 @@ namespace Nano.Net
             return EncodedAddressChecksum(publicKey) == address[^8..];
         }
 
-        // this could probably be made more efficient and it also needs more testing
-        public static bool IsWorkValid(string hash, string powNonce, string threshold = null)
+        /// <summary>
+        /// Validates a work nonce for a hash and threshold.
+        /// Note that the minimum work threshold is lower for receive blocks.
+        /// </summary>
+        /// <param name="hash">The previous block hash, or if this is the first block for an account, the account's public key.</param>
+        /// <param name="powNonce">The work to be validated.</param>
+        /// <param name="threshold">The minimum work threshold.</param>
+        /// <returns>true if the difficulty is above or equal to the threshold, false otherwise.</returns>
+        public static bool IsWorkValid(string hash, string powNonce, string threshold)
         {
-            byte[] thresholdBytes = threshold is null ? "fffffff800000000".HexToBytes() : threshold.HexToBytes();
-            ulong thresholdValue = BitConverter.ToUInt64(thresholdBytes.Reverse().ToArray());
+            if (string.IsNullOrEmpty(threshold))
+                throw new ArgumentException("The threshold should not be a null or empty string.", nameof(threshold));
+            
+            byte[] thresholdBytes = threshold.HexToBytes().Reverse().ToArray();
+            ulong thresholdValue = BitConverter.ToUInt64(thresholdBytes);
 
             byte[] hashBytes = hash.HexToBytes();
             byte[] workBytes = powNonce.HexToBytes().Reverse().ToArray();
@@ -186,7 +196,17 @@ namespace Nano.Net
             byte[] output = Blake2BHash(8, workBytes, hashBytes);
             ulong outputValue = BitConverter.ToUInt64(output);
 
-            return outputValue > thresholdValue;
+            return outputValue >= thresholdValue;
+        }
+        
+        [Obsolete("The work difficulty threshold should be explicitly specified.")]
+        public static bool IsWorkValid(string hash, string powNonce)
+        {
+            // this uses the send block difficulty threshold by default to avoid returning false positives,
+            // meaning this method may return false for a valid work for a receive block.
+            const string sendBlockDifficultyThreshold = "fffffff800000000";
+            
+            return IsWorkValid(hash, powNonce, sendBlockDifficultyThreshold);
         }
     }
 }
