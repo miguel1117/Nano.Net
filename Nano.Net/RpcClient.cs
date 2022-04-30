@@ -120,6 +120,21 @@ namespace Nano.Net
                 Difficulty = difficulty
             });
         }
+        
+        /// <summary>
+        /// Check whether work is valid for block.
+        /// ValidAll is true if the work is valid at the current network difficulty (work can be used for any block).
+        /// ValidReceive is true if the work is valid for use in a receive block.
+        /// </summary>
+        public async Task<WorkValidateResponse> ValidateWorkAsync(string work, string hash)
+        {
+            return await RpcRequestAsync<WorkValidateResponse>(new
+            {
+                Action = "work_validate",
+                Work = work,
+                Hash = hash
+            });
+        }
 
         /// <summary>
         /// Gets the pending/receivable blocks for an account.

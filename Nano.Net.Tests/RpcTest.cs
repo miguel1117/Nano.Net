@@ -75,6 +75,14 @@ public class RpcTest
         Assert.Equal("15000000000000000000000000000", blockInfoResponse.Balance);
         Assert.Equal("nano_1iuz18n4g4wfp9gf7p1s8qkygxw7wx9qfjq6a9aq68uyrdnningdcjontgar", blockInfoResponse.Content.Representative);
     }
+    
+    [Fact]
+    public async void WorkValidate_ValidateResult_ValidResult()
+    {
+        WorkValidateResponse response = await _rpcClient.ValidateWorkAsync("2bf29ef00786a6bc", "718CC2121C3E641059BC1C2CFC45666C99E8AE922F7A807B7D07B62C995D79E2");
+        
+        Assert.False(string.IsNullOrEmpty(response.Difficulty));
+    }
 
     [Fact(Skip = "This test requires a RPC with the work generation feature enabled.")]
     public async void WorkGenerate_ValidateResult_ValidResult()
