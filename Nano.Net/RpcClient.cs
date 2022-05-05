@@ -211,11 +211,8 @@ namespace Nano.Net
                 Count = count
             });
 
-            // receiveableBlocks.Blocks is null when the accounts requested to check have no blocks
-            if (receivableBlocks.Blocks == null)
-            {
-                receivableBlocks.Blocks = new Dictionary<string, Dictionary<string, ReceivableBlock>>();
-            }
+            // AccountsPendingResponse.Blocks is null if the requested accounts have no receivable blocks
+            receivableBlocks.Blocks ??= new Dictionary<string, Dictionary<string, ReceivableBlock>>();
 
             foreach (var address in receivableBlocks.Blocks)
             {
