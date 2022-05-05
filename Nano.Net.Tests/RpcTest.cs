@@ -68,7 +68,7 @@ public class RpcTest
     }
 
     [Fact]
-    public async void AccountsPending_ValidateResult_ValidResult2()
+    public async void AccountsPending_EmptyResult_BlocksNotNull()
     {
         string account = new Account().Address;
         AccountsPendingResponse accountsPendingResponse = await _rpcClient.AccountsPendingAsync(new string[] { account });
