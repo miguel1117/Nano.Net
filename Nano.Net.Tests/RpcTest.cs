@@ -68,6 +68,16 @@ public class RpcTest
     }
 
     [Fact]
+    public async void AccountsPending_EmptyResult_BlocksNotNull()
+    {
+        string account = new Account().Address;
+        AccountsPendingResponse accountsPendingResponse = await _rpcClient.AccountsPendingAsync(new string[] { account });
+        
+        Assert.NotNull(accountsPendingResponse.Blocks);
+        Assert.Empty(accountsPendingResponse.Blocks);
+    }
+
+    [Fact]
     public async void BlockInfo_ValidateResult_ValidResult()
     {
         BlockInfoResponse blockInfoResponse = await _rpcClient.BlockInfoAsync("75F0B821DE3B25908755520117660E1297DDEA774DEC817FAA2C27221442403A");

@@ -2,6 +2,7 @@
 
 
 using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
@@ -202,7 +203,7 @@ namespace Nano.Net
         /// </summary>
         public async Task<AccountsPendingResponse> AccountsPendingAsync(string[] accounts, int count = 5)
         {
-            var receivableBlocks =  await RpcRequestAsync<AccountsPendingResponse>(new
+            var receivableBlocks = await RpcRequestAsync<AccountsPendingResponse>(new
             {
                 Action = "accounts_pending",
                 Accounts = accounts,
@@ -210,11 +211,14 @@ namespace Nano.Net
                 Count = count
             });
 
+            // AccountsPendingResponse.Blocks is null if the requested accounts have no receivable blocks
+            receivableBlocks.Blocks ??= new Dictionary<string, Dictionary<string, ReceivableBlock>>();
+
             foreach (var address in receivableBlocks.Blocks)
             {
                 if (address.Value is null)
                     continue;
-                
+
                 foreach (var block in address.Value)
                     block.Value.Hash = block.Key;
             }
