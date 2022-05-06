@@ -1,13 +1,18 @@
 using System;
 using System.Linq;
 using Xunit;
+using Xunit.Sdk;
 
 namespace Nano.Net.Tests;
 
 public class RpcTest
 {
     private readonly RpcClient _rpcClient = new RpcClient(Constants.RpcAddress);
-    private const string TestAccountPrivateKey = "0000000000000000000000000000000000000000000000000000000000000000";
+    
+    /// <summary>
+    /// This account will be used for the block publishing tests.
+    /// </summary>
+    private const string TestAccountPrivateKey = "";
 
     [Fact]
     public async void AccountInfo_ValidateResult_ValidResult()
@@ -109,8 +114,12 @@ public class RpcTest
     {
         var account = new Account(privateKey: TestAccountPrivateKey);
         await _rpcClient.UpdateAccountAsync(account);
+        var workResponse = await _rpcClient.WorkGenerateAsync(account.Frontier);
 
-        var block = Block.CreateSendBlock(account, new Account().Address, account.Balance, "0000000000000000");
+        if (!account.Opened || account.Balance.Raw == 0)
+            throw new TestClassException("The test account needs to be open and have a balance of at least 1 raw for this test.");
+        
+        var block = Block.CreateSendBlock(account, account.Address, account.Balance, workResponse.Work);
         var response = await _rpcClient.ProcessAsync(block);
 
         Assert.NotNull(response.Hash);
@@ -121,9 +130,10 @@ public class RpcTest
     {
         var account = new Account(privateKey: TestAccountPrivateKey);
         await _rpcClient.UpdateAccountAsync(account);
-
-        var block = Block.CreateReceiveBlock(account, "0000000000000000000000000000000000000000000000000000000000000000", Amount.FromRaw("0"),
-            "0000000000000000");
+        var receivableBlocksResponse = await _rpcClient.PendingBlocksAsync(account.Address);
+        var workResponse = await _rpcClient.WorkGenerateAsync(account.Frontier);
+        
+        var block = Block.CreateReceiveBlock(account, receivableBlocksResponse.PendingBlocks.First().Value, workResponse.Work);
         var response = await _rpcClient.ProcessAsync(block);
 
         Assert.NotNull(response.Hash);
