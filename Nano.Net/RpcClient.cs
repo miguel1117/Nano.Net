@@ -1,6 +1,5 @@
 ﻿// This is a modified version of the code from https://github.com/Flufd/NanoDotNet/blob/master/NanoDotNet/NanoRpcClient.cs
 
-
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
@@ -17,7 +16,6 @@ namespace Nano.Net
         public string NodeAddress { get; }
 
         private readonly HttpClient _httpClient = new HttpClient();
-
         private readonly JsonSerializerSettings _jsonSerializerSettings = new JsonSerializerSettings
         {
             NullValueHandling = NullValueHandling.Ignore,
@@ -30,15 +28,14 @@ namespace Nano.Net
         /// <summary>
         /// Create a new RpcClient connected to a local node.
         /// </summary>
-        public RpcClient()
+        public RpcClient() : this("http://localhost:7076")
         {
-            NodeAddress = "http://localhost:7076";
         }
 
         /// <summary>
-        /// Initialize rpc with a specific uri.
+        /// Create a new RpcClient object with the specific URI.
         /// </summary>
-        /// <param name="nodeUri">Example: Http://192.168.0.1:7076</param>
+        /// <param name="nodeUri">Example: http://192.168.0.1:7076</param>
         public RpcClient(string nodeUri)
         {
             NodeAddress = nodeUri;
@@ -46,7 +43,8 @@ namespace Nano.Net
 
         private async Task<T> RpcRequestAsync<T>(object request)
         {
-            var content = new StringContent(JsonConvert.SerializeObject(request, _jsonSerializerSettings), Encoding.UTF8, "application/json");
+            var serializedBlock = JsonConvert.SerializeObject(request, _jsonSerializerSettings);
+            var content = new StringContent(serializedBlock, Encoding.UTF8, "application/json");
             HttpResponseMessage response = await _httpClient.PostAsync(NodeAddress, content);
             string json = await response.Content.ReadAsStringAsync();
 
@@ -110,7 +108,8 @@ namespace Nano.Net
         /// Generate a work nonce for a hash using the node.
         /// </summary>
         /// <remarks>
-        /// WARNING: This command is usually disabled on public nodes. You need to use your own node.
+        /// This command is often disabled on public nodes.
+        /// You may need to run your own node or <a href="https://github.com/nanocurrency/nano-work-server">nano-work-server</a>.
         /// </remarks>
         public async Task<WorkGenerateResponse> WorkGenerateAsync(string hash, string difficulty = null)
         {
@@ -124,9 +123,12 @@ namespace Nano.Net
         
         /// <summary>
         /// Check whether work is valid for block.
-        /// ValidAll is true if the work is valid at the current network difficulty (work can be used for any block).
-        /// ValidReceive is true if the work is valid for use in a receive block.
         /// </summary>
+        /// <returns>
+        /// A WorkValidateResponse instance.
+        /// WorkValidateResponse.ValidAll is true if the work is valid at the current network difficulty (work can be used for any block).
+        /// WorkValidateResponse.ValidReceive is true if the work is valid for use in a receive block.
+        /// </returns>
         public async Task<WorkValidateResponse> ValidateWorkAsync(string work, string hash)
         {
             return await RpcRequestAsync<WorkValidateResponse>(new
@@ -171,7 +173,7 @@ namespace Nano.Net
         /// <summary>
         /// Publishes a Block to the network.
         /// </summary>
-        /// <exception cref="Exception">If the block signature or work nonce hasn't been set.</exception>
+        /// <exception cref="IncompleteBlockException">If the block signature or work nonce hasn't been set.</exception>
         public async Task<ProcessResponse> ProcessAsync(Block block)
         {
             if (block.Signature is null)
