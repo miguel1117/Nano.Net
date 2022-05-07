@@ -24,17 +24,8 @@ This project follows Semantic Versioning.
 You can either:
 
 * Install the package [from Nuget](https://www.nuget.org/packages/Nano.Net/).
-* Include this library's source code in your project and reference it.
+* Include the Nano.Net project in your project's solution and add a reference to it in your projects.
 
-Note: If your project targets .NET Core then the C# version should be explicitly set to version 9 in your project's
-.csproj file. Example:
-
-```xml
-
-<PropertyGroup>
-    <LangVersion>9.0</LangVersion>
-</PropertyGroup>
-```
 
 ## Usage
 
@@ -160,4 +151,4 @@ await w.Start();
 ## Donations
 
 This library is 100% free, but donations are accepted at the address below. Any amount is appreciated.
-`nano_168owitqjg7nhg1jqcqf9q4uqgtmcp5h9xtydh6ybz7zqa9mp197draz4azs`
+`nano_3h71hnsc5asdsd9qfetxwr6do7ebkyef6ufwbybfbh3z7itts6wym5b4tg7x`
