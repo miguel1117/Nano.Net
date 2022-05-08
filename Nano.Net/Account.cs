@@ -88,7 +88,7 @@ namespace Nano.Net
         /// <param name="seed">The seed as a hex string used to derive the private key for this account.</param>
         /// <param name="index">The index used to derive the key.</param>
         /// <param name="prefix">The prefix used for the address (without the "_"). Defaults to nano.</param>
-        [Obsolete]
+        [Obsolete("Use the constructor instead.")]
         public static Account FromSeed(string seed, uint index, string prefix = "nano")
         {
             return new Account(seed, index, prefix);
@@ -99,7 +99,7 @@ namespace Nano.Net
         /// </summary>
         /// <param name="privateKey">Private key bytes bytes.</param>
         /// <param name="prefix">The prefix used for the address (without the "_"). Defaults to nano.</param>
-        [Obsolete]
+        [Obsolete("Use the constructor instead.")]
         public static Account FromPrivateKey(byte[] privateKey, string prefix = "nano")
         {
             return new Account(privateKey, prefix);
@@ -110,7 +110,7 @@ namespace Nano.Net
         /// </summary>
         /// <param name="privateKey">Private key bytes encoded as a hex string.</param>
         /// <param name="prefix">The prefix used for the address (without the "_"). Defaults to nano.</param>
-        [Obsolete]
+        [Obsolete("Use the constructor instead.")]
         public static Account FromPrivateKey(string privateKey, string prefix = "nano")
         {
             return new Account(privateKey, prefix);
