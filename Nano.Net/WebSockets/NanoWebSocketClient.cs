@@ -115,8 +115,8 @@ namespace Nano.Net.WebSockets
             if (!_clientWebSocket.IsStarted)
                 return;
             
-            foreach ((string _, Topic topic) in _subscriptions)
-                SendTopic("subscribe", topic);
+            foreach (KeyValuePair<string, Topic> subscription in _subscriptions)
+                SendTopic("subscribe", subscription.Value);
         }
         
         /// <summary>

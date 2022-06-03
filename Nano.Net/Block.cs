@@ -123,7 +123,10 @@ namespace Nano.Net
 
         private string GetHash()
         {
-            byte[] balanceBytes = BigInteger.Parse(Balance).ToByteArray(true, true);
+            byte[] balanceBytes = BigInteger.Parse(Balance).ToByteArray();
+            if (balanceBytes.Length > 1 && balanceBytes.Last() == 0)
+                Array.Resize(ref balanceBytes, balanceBytes.Length - 1); // remove trailing 0 (sign byte)
+            balanceBytes = balanceBytes.Reverse().ToArray(); // convert to big endian
 
             byte[] final = Blake2BHash
             (
