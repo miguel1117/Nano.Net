@@ -154,8 +154,8 @@ namespace Nano.Net
             });
 
             if (pendingBlocks?.PendingBlocks != null)
-                foreach ((string key, ReceivableBlock value) in pendingBlocks?.PendingBlocks)
-                    value.Hash = key;
+                foreach (var block in pendingBlocks?.PendingBlocks)
+                    block.Value.Hash = block.Key;
 
             return pendingBlocks;
         }

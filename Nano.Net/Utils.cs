@@ -82,7 +82,7 @@ namespace Nano.Net
             foreach (char t in data)
                 stringBuilder.Append(NanoAddressEncoding[t]); // Decode each character into string representation of it's binary parts
 
-            var binaryString = stringBuilder.ToString()[4..]; // Remove leading 4 0s
+            var binaryString = stringBuilder.ToString().Substring(4); // Remove leading 4 0s
 
             // Convert to bytes
             var publicKeyBytes = new byte[32];
@@ -171,7 +171,8 @@ namespace Nano.Net
 
             byte[] publicKey = DecodeNanoBase32(address);
 
-            return EncodedAddressChecksum(publicKey) == address[^8..];
+            var checksum = address.Substring(address.Length - 8);
+            return EncodedAddressChecksum(publicKey) == checksum;
         }
 
         /// <summary>
@@ -188,13 +189,13 @@ namespace Nano.Net
                 throw new ArgumentException("The threshold should not be a null or empty string.", nameof(threshold));
             
             byte[] thresholdBytes = threshold.HexToBytes().Reverse().ToArray();
-            ulong thresholdValue = BitConverter.ToUInt64(thresholdBytes);
+            ulong thresholdValue = BitConverter.ToUInt64(thresholdBytes, 0);
 
             byte[] hashBytes = hash.HexToBytes();
             byte[] workBytes = powNonce.HexToBytes().Reverse().ToArray();
 
             byte[] output = Blake2BHash(8, workBytes, hashBytes);
-            ulong outputValue = BitConverter.ToUInt64(output);
+            ulong outputValue = BitConverter.ToUInt64(output, 0);
 
             return outputValue >= thresholdValue;
         }
