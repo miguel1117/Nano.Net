@@ -41,11 +41,11 @@ namespace Nano.Net
             NodeAddress = nodeUri;
         }
 
-        private async Task<T> RpcRequestAsync<T>(object request)
+        private async Task<T> RpcRequestAsync<T>(object request, string url = null)
         {
             var serializedBlock = JsonConvert.SerializeObject(request, _jsonSerializerSettings);
             var content = new StringContent(serializedBlock, Encoding.UTF8, "application/json");
-            HttpResponseMessage response = await _httpClient.PostAsync(NodeAddress, content);
+            HttpResponseMessage response = await _httpClient.PostAsync(string.IsNullOrEmpty(url) ? NodeAddress : url, content);
             string json = await response.Content.ReadAsStringAsync();
 
             if (json.Contains("\"error\":"))
@@ -119,6 +119,19 @@ namespace Nano.Net
                 Hash = hash,
                 Difficulty = difficulty
             });
+        }
+
+        /// <summary>
+        /// Generate a work nonce for a hash using the work server.
+        /// </summary>
+        public async Task<WorkGenerateResponse> WorkGenerateAsync(string workServerUrl, string hash, string difficulty = null)
+        {
+            return await RpcRequestAsync<WorkGenerateResponse>(new
+            {
+                Action = "work_generate",
+                Hash = hash,
+                Difficulty = difficulty
+            }, workServerUrl);
         }
         
         /// <summary>
