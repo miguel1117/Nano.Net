@@ -1,6 +1,5 @@
 ﻿// This is a modified version of the code from https://github.com/Flufd/NanoDotNet/blob/master/NanoDotNet/NanoRpcClient.cs
 
-using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
@@ -43,10 +42,10 @@ public class RpcClient
 
     private async Task<T> RpcRequestAsync<T>(object request)
     {
-        var serializedBlock = JsonConvert.SerializeObject(request, _jsonSerializerSettings);
+        string serializedBlock = JsonConvert.SerializeObject(request, _jsonSerializerSettings);
         var content = new StringContent(serializedBlock, Encoding.UTF8, "application/json");
-        HttpResponseMessage response = await _httpClient.PostAsync(NodeAddress, content);
-        string json = await response.Content.ReadAsStringAsync();
+        HttpResponseMessage response = await _httpClient.PostAsync(NodeAddress, content).ConfigureAwait(false);
+        string json = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
         if (json.Contains("\"error\":"))
         {
@@ -74,7 +73,7 @@ public class RpcClient
                 Pending = pending,
                 Weight = weight,
                 IncludeConfirmed = confirmed
-            });
+            }).ConfigureAwait(false);
         }
         catch (RpcException exception)
         {
@@ -91,7 +90,7 @@ public class RpcClient
         {
             Action = "accounts_frontiers",
             Accounts = accounts
-        });
+        }).ConfigureAwait(false);
     }
 
     public async Task<AccountHistoryResponse> AccountHistoryAsync(string address, int count = 10)
@@ -101,7 +100,7 @@ public class RpcClient
             Action = "account_history",
             Account = address,
             Count = count
-        });
+        }).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -118,7 +117,7 @@ public class RpcClient
             Action = "work_generate",
             Hash = hash,
             Difficulty = difficulty
-        });
+        }).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -136,7 +135,7 @@ public class RpcClient
             Action = "work_validate",
             Work = work,
             Hash = hash
-        });
+        }).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -151,7 +150,7 @@ public class RpcClient
             Count = count.ToString(),
             Source = true,
             IncludeOnlyConfirmed = true
-        });
+        }).ConfigureAwait(false);
 
         if (pendingBlocks?.PendingBlocks != null)
             foreach (var block in pendingBlocks?.PendingBlocks)
@@ -167,7 +166,7 @@ public class RpcClient
             Action = "block_info",
             json_block = "true",
             Hash = hash
-        });
+        }).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -188,7 +187,7 @@ public class RpcClient
             JsonBlock = true,
             Subtype = block.Subtype,
             Block = block
-        });
+        }).ConfigureAwait(false);
     }
 
     public async Task<AccountsBalancesResponse> AccountsBalancesAsync(string[] accounts)
@@ -197,7 +196,7 @@ public class RpcClient
         {
             Action = "accounts_balances",
             Accounts = accounts
-        });
+        }).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -211,7 +210,7 @@ public class RpcClient
             Accounts = accounts,
             Source = true,
             Count = count
-        });
+        }).ConfigureAwait(false);
 
         // AccountsPendingResponse.Blocks is null if the requested accounts have no receivable blocks
         receivableBlocks.Blocks ??= new Dictionary<string, Dictionary<string, ReceivableBlock>>();
@@ -239,7 +238,7 @@ public class RpcClient
 
         try
         {
-            accountInfo = await AccountInfoAsync(account.Address);
+            accountInfo = await AccountInfoAsync(account.Address).ConfigureAwait(false);
         }
         catch (UnopenedAccountException)
         {
