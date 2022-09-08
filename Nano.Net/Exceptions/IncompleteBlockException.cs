@@ -1,11 +1,10 @@
 ﻿using System;
 
-namespace Nano.Net
+namespace Nano.Net;
+
+public class IncompleteBlockException : Exception
 {
-    public class IncompleteBlockException : Exception
+    public IncompleteBlockException(string message) : base(message)
     {
-        public IncompleteBlockException(string message) : base(message)
-        {
-        }
     }
 }

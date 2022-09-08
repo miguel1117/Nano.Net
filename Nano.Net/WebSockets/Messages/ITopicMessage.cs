@@ -1,10 +1,9 @@
 using Newtonsoft.Json;
 
-namespace Nano.Net.WebSockets
+namespace Nano.Net.WebSockets;
+
+public interface ITopicMessage
 {
-    public interface ITopicMessage
-    {
-        public string Topic { get; init; }
-        public string Time { get; init; }
-    }
+    public string Topic { get; init; }
+    public string Time { get; init; }
 }

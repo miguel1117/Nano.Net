@@ -1,14 +1,13 @@
 ﻿using System;
 
-namespace Nano.Net
-{
-    public class RpcException : Exception
-    {
-        public string OriginalError { get; }
+namespace Nano.Net;
 
-        public RpcException(string errorMessage) : base($"RPC call returned error. Message: {errorMessage}")
-        {
-            OriginalError = errorMessage;
-        }
+public class RpcException : Exception
+{
+    public string OriginalError { get; }
+
+    public RpcException(string errorMessage) : base($"RPC call returned error. Message: {errorMessage}")
+    {
+        OriginalError = errorMessage;
     }
 }
