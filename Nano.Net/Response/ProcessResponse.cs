@@ -1,9 +1,8 @@
 ﻿using Newtonsoft.Json;
 
-namespace Nano.Net
+namespace Nano.Net;
+
+public class ProcessResponse
 {
-    public class ProcessResponse
-    {
-        [JsonProperty("hash")] public string Hash { get; init; } 
-    }
+    [JsonProperty("hash")] public string Hash { get; init; }
 }

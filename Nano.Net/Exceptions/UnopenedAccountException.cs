@@ -1,11 +1,10 @@
 ﻿using System;
 
-namespace Nano.Net
+namespace Nano.Net;
+
+public class UnopenedAccountException : Exception
 {
-    public class UnopenedAccountException : Exception
+    public UnopenedAccountException() : base("This account hasn't been opened yet.")
     {
-        public UnopenedAccountException() : base("This account hasn't been opened yet.")
-        {
-        }
     }
 }

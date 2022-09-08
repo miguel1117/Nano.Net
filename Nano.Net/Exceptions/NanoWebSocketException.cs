@@ -1,11 +1,10 @@
 using System;
 
-namespace Nano.Net
+namespace Nano.Net;
+
+public class NanoWebSocketException : Exception
 {
-    public class NanoWebSocketException : Exception
+    public NanoWebSocketException(string message) : base(message)
     {
-        public NanoWebSocketException(string message) : base(message)
-        {
-        }
     }
 }

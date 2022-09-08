@@ -1,11 +1,10 @@
 ﻿using System;
 
-namespace Nano.Net
+namespace Nano.Net;
+
+public class InsufficientBalanceException : Exception
 {
-    public class InsufficientBalanceException : Exception
+    public InsufficientBalanceException(string message) : base(message)
     {
-        public InsufficientBalanceException(string message) : base(message)
-        {
-        }
     }
 }

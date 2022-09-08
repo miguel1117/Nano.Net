@@ -1,11 +1,10 @@
 ﻿using Newtonsoft.Json;
 using System.Collections.Generic;
 
-namespace Nano.Net
+namespace Nano.Net;
+
+public class AccountsPendingResponse
 {
-    public class AccountsPendingResponse
-    {
-        [JsonProperty("blocks")]
-        public Dictionary<string, Dictionary<string, ReceivableBlock>> Blocks { get; set; }
-    }
+    [JsonProperty("blocks")]
+    public Dictionary<string, Dictionary<string, ReceivableBlock>> Blocks { get; set; }
 }

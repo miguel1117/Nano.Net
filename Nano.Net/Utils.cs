@@ -8,206 +8,202 @@ using Blake2Sharp;
 using Chaos.NaCl;
 using Nano.Net.Extensions;
 
-namespace Nano.Net
+namespace Nano.Net;
+
+public static class Utils
 {
-    public static class Utils
+    private static readonly Dictionary<char, string> NanoAddressEncoding;
+    private static readonly Dictionary<string, char> NanoAddressDecoding;
+
+    static Utils()
     {
-        private static readonly Dictionary<char, string> NanoAddressEncoding;
-        private static readonly Dictionary<string, char> NanoAddressDecoding;
+        const string nanoAlphabet = "13456789abcdefghijkmnopqrstuwxyz";
 
-        static Utils()
+        NanoAddressEncoding = new Dictionary<char, string>();
+        NanoAddressDecoding = new Dictionary<string, char>();
+
+        for (var i = 0; i < nanoAlphabet.Length; i++)
         {
-            const string nanoAlphabet = "13456789abcdefghijkmnopqrstuwxyz";
-            
-            NanoAddressEncoding = new Dictionary<char, string>();
-            NanoAddressDecoding = new Dictionary<string, char>();
+            char c = nanoAlphabet[i];
 
-            for (var i = 0; i < nanoAlphabet.Length; i++)
-            {
-                char c = nanoAlphabet[i];
-
-                NanoAddressEncoding[c] = Convert.ToString(i, 2).PadLeft(5, '0');
-                NanoAddressDecoding[Convert.ToString(i, 2).PadLeft(5, '0')] = c;
-            }
+            NanoAddressEncoding[c] = Convert.ToString(i, 2).PadLeft(5, '0');
+            NanoAddressDecoding[Convert.ToString(i, 2).PadLeft(5, '0')] = c;
         }
-        
-        [Obsolete("Use the provided extension methods instead.")]
-        public static byte[] HexToBytes(string hex)
+    }
+
+    [Obsolete("Use the provided extension methods instead.")]
+    public static byte[] HexToBytes(string hex)
+    {
+        return hex.HexToBytes();
+    }
+
+    [Obsolete("Use the provided extension methods instead.")]
+    public static string BytesToHex(byte[] bytes)
+    {
+        return bytes.BytesToHex();
+    }
+
+    public static string GenerateSeed()
+    {
+        var seed = new byte[32];
+
+        var rngCryptoServiceProvider = new RNGCryptoServiceProvider();
+        rngCryptoServiceProvider.GetBytes(seed);
+
+        return seed.BytesToHex();
+    }
+
+    private static string EncodeNanoBase32(byte[] data, bool padZeros = true)
+    {
+        var stringBuilder = new StringBuilder(padZeros ? "0000" : string.Empty);
+
+        foreach (byte t in data)
+            stringBuilder.Append(Convert.ToString(t, 2).PadLeft(8, '0'));
+
+        var binaryString = stringBuilder.ToString();
+        var result = new StringBuilder(capacity: 65);
+
+        for (var i = 0; i < binaryString.Length; i += 5)
+            result.Append(NanoAddressDecoding[binaryString.Substring(i, 5)]);
+
+        return result.ToString();
+    }
+
+    private static byte[] DecodeNanoBase32(string data)
+    {
+        int prefixIndex = data.IndexOf("_", StringComparison.Ordinal);
+
+        if (prefixIndex == -1)
+            throw new ArgumentException("This address isn't valid.");
+
+        data = data.Substring(prefixIndex + 1, 52);
+
+        var stringBuilder = new StringBuilder();
+        foreach (char t in data)
+            stringBuilder.Append(NanoAddressEncoding[t]); // Decode each character into string representation of it's binary parts
+
+        var binaryString = stringBuilder.ToString().Substring(4); // Remove leading 4 0s
+
+        // Convert to bytes
+        var publicKeyBytes = new byte[32];
+        for (var i = 0; i < 32; i++)
         {
-            return hex.HexToBytes();
-        }
-        
-        [Obsolete("Use the provided extension methods instead.")]
-        public static string BytesToHex(byte[] bytes)
-        {
-            return bytes.BytesToHex();
-        }
-
-        public static string GenerateSeed()
-        {
-            var seed = new byte[32];
-
-            var rngCryptoServiceProvider = new RNGCryptoServiceProvider();
-            rngCryptoServiceProvider.GetBytes(seed);
-
-            return seed.BytesToHex();
-        }
-
-        private static string EncodeNanoBase32(byte[] data, bool padZeros = true)
-        {
-            var stringBuilder = new StringBuilder(padZeros ? "0000" : string.Empty);
-
-            foreach (byte t in data)
-                stringBuilder.Append(Convert.ToString(t, 2).PadLeft(8, '0'));
-
-            var binaryString = stringBuilder.ToString();
-            var result = string.Empty;
-
-            for (var i = 0; i < binaryString.Length; i += 5)
-                result += NanoAddressDecoding[binaryString.Substring(i, 5)];
-
-            return result;
-        }
-
-        private static byte[] DecodeNanoBase32(string data)
-        {
-            int prefixIndex = data.IndexOf("_", StringComparison.Ordinal);
-
-            if (prefixIndex == -1)
-                throw new ArgumentException("This address isn't valid.");
-
-            data = data.Substring(prefixIndex + 1, 52);
-
-            var stringBuilder = new StringBuilder();
-            foreach (char t in data)
-                stringBuilder.Append(NanoAddressEncoding[t]); // Decode each character into string representation of it's binary parts
-
-            var binaryString = stringBuilder.ToString().Substring(4); // Remove leading 4 0s
-
-            // Convert to bytes
-            var publicKeyBytes = new byte[32];
-            for (var i = 0; i < 32; i++)
-            {
-                var b = Convert.ToByte(binaryString.Substring(i * 8, 8), 2); // for each byte, read the bits from the binary string
-                publicKeyBytes[i] = b;
-            }
-
-            return publicKeyBytes;
+            var b = Convert.ToByte(binaryString.Substring(i * 8, 8), 2); // for each byte, read the bits from the binary string
+            publicKeyBytes[i] = b;
         }
 
-        internal static byte[] Blake2BHash(int sizeInBytes, params byte[][] data)
-        {
-            Hasher hasher = Blake2B.Create(new Blake2BConfig() { OutputSizeInBytes = sizeInBytes });
-            hasher.Init();
+        return publicKeyBytes;
+    }
 
-            foreach (byte[] bytes in data)
-                hasher.Update(bytes);
+    internal static byte[] Blake2BHash(int sizeInBytes, params byte[][] data)
+    {
+        Hasher hasher = Blake2B.Create(new Blake2BConfig() { OutputSizeInBytes = sizeInBytes });
+        hasher.Init();
 
-            return hasher.Finish();
-        }
+        foreach (byte[] bytes in data)
+            hasher.Update(bytes);
 
-        public static byte[] DerivePrivateKey(byte[] seed, uint index)
-        {
-            if (seed.Length != 32)
-                throw new ArgumentException("A Nano seed should consist of 64 hex characters.");
+        return hasher.Finish();
+    }
 
-            byte[] indexBytes = BitConverter.GetBytes(index);
-            if (BitConverter.IsLittleEndian)
-                indexBytes = indexBytes.Reverse().ToArray();
+    public static byte[] DerivePrivateKey(byte[] seed, uint index)
+    {
+        if (seed.Length != 32)
+            throw new ArgumentException("A Nano seed should consist of 64 hex characters.");
 
-            return Blake2BHash(32, seed, indexBytes);
-        }
-        
-        [Obsolete]
-        public static byte[] DerivePrivateKey(string seed, uint index) // this only exists to keep the API backwards compatible, since this used to be the original method
-        {
-            return DerivePrivateKey(HexToBytes(seed), index);
-        }
+        byte[] indexBytes = BitConverter.GetBytes(index);
+        if (BitConverter.IsLittleEndian)
+            indexBytes = indexBytes.Reverse().ToArray();
 
-        public static byte[] PublicKeyFromPrivateKey(byte[] privateKey)
-        {
-            if (privateKey.Length != 32)
-                throw new ArgumentException("A private key must be exactly 32 bytes.");
+        return Blake2BHash(32, seed, indexBytes);
+    }
 
-            Ed25519.KeyPairFromSeed(out byte[] publicKey, out byte[] _, privateKey);
-            return publicKey;
-        }
+    [Obsolete]
+    public static byte[] DerivePrivateKey(string seed, uint index) // this only exists to keep the API backwards compatible, since this used to be the original method
+    {
+        return DerivePrivateKey(HexToBytes(seed), index);
+    }
 
-        private static string EncodedAddressChecksum(byte[] publicKey)
-        {
-            byte[] final = Blake2BHash(5, publicKey);
+    public static byte[] PublicKeyFromPrivateKey(byte[] privateKey)
+    {
+        if (privateKey.Length != 32)
+            throw new ArgumentException("A private key must be exactly 32 bytes.");
 
-            return EncodeNanoBase32(final.Reverse().ToArray(), false);
-        }
+        Ed25519.KeyPairFromSeed(out byte[] publicKey, out byte[] _, privateKey);
+        return publicKey;
+    }
 
-        public static string AddressFromPublicKey(byte[] publicKey, string prefix = "nano")
-        {
-            if (publicKey.Length != 32)
-                throw new ArgumentException("A public key must be exactly 32 bytes.");
+    private static string EncodedAddressChecksum(byte[] publicKey)
+    {
+        byte[] final = Blake2BHash(5, publicKey);
 
-            if (!prefix.EndsWith("_"))
-                prefix += "_";
-            var address = prefix;
-            address += EncodeNanoBase32(publicKey);
-            address += EncodedAddressChecksum(publicKey);
+        return EncodeNanoBase32(final.Reverse().ToArray(), false);
+    }
 
-            return address;
-        }
+    public static string AddressFromPublicKey(byte[] publicKey, string prefix = "nano")
+    {
+        if (publicKey.Length != 32)
+            throw new ArgumentException("A public key must be exactly 32 bytes.");
 
-        public static byte[] PublicKeyFromAddress(string address)
-        {
-            if (IsAddressValid(address, new string[] { address.Substring(0, address.IndexOf("_")) }))
-                return DecodeNanoBase32(address);
-            else
-                throw new ArgumentException("This Nano address isn't valid.");
-        }
+        if (!prefix.EndsWith("_"))
+            prefix += "_";
 
-        public static bool IsAddressValid(string address, string[] allowedPrefixes = null)
-        {
-            allowedPrefixes ??= new string[] { "nano", "xrb" };
+        return prefix + EncodeNanoBase32(publicKey) + EncodedAddressChecksum(publicKey);
+    }
 
-            if (!Regex.IsMatch(address, @$"^({string.Join("|", allowedPrefixes)})_[13]{{1}}[13456789abcdefghijkmnopqrstuwxyz]{{59}}$"))
-                return false;
+    public static byte[] PublicKeyFromAddress(string address)
+    {
+        if (IsAddressValid(address, new string[] { address.Substring(0, address.IndexOf("_", StringComparison.Ordinal)) }))
+            return DecodeNanoBase32(address);
+        else
+            throw new ArgumentException("This Nano address isn't valid.");
+    }
 
-            byte[] publicKey = DecodeNanoBase32(address);
+    public static bool IsAddressValid(string address, string[] allowedPrefixes = null)
+    {
+        allowedPrefixes ??= new string[] { "nano", "xrb" };
 
-            var checksum = address.Substring(address.Length - 8);
-            return EncodedAddressChecksum(publicKey) == checksum;
-        }
+        if (!Regex.IsMatch(address, @$"^({string.Join("|", allowedPrefixes)})_[13]{{1}}[13456789abcdefghijkmnopqrstuwxyz]{{59}}$"))
+            return false;
 
-        /// <summary>
-        /// Validates a work nonce for a hash and threshold.
-        /// Note that the minimum work threshold is lower for receive blocks.
-        /// </summary>
-        /// <param name="hash">The previous block hash, or if this is the first block for an account, the account's public key.</param>
-        /// <param name="powNonce">The work to be validated.</param>
-        /// <param name="threshold">The minimum work threshold.</param>
-        /// <returns>true if the difficulty is above or equal to the threshold, false otherwise.</returns>
-        public static bool IsWorkValid(string hash, string powNonce, string threshold)
-        {
-            if (string.IsNullOrEmpty(threshold))
-                throw new ArgumentException("The threshold should not be a null or empty string.", nameof(threshold));
-            
-            byte[] thresholdBytes = threshold.HexToBytes().Reverse().ToArray();
-            ulong thresholdValue = BitConverter.ToUInt64(thresholdBytes, 0);
+        byte[] publicKey = DecodeNanoBase32(address);
 
-            byte[] hashBytes = hash.HexToBytes();
-            byte[] workBytes = powNonce.HexToBytes().Reverse().ToArray();
+        string checksum = address.Substring(address.Length - 8);
+        return EncodedAddressChecksum(publicKey) == checksum;
+    }
 
-            byte[] output = Blake2BHash(8, workBytes, hashBytes);
-            ulong outputValue = BitConverter.ToUInt64(output, 0);
+    /// <summary>
+    /// Validates a work nonce for a hash and threshold.
+    /// Note that the minimum work threshold is lower for receive blocks.
+    /// </summary>
+    /// <param name="hash">The previous block hash, or if this is the first block for an account, the account's public key.</param>
+    /// <param name="powNonce">The work to be validated.</param>
+    /// <param name="threshold">The minimum work threshold.</param>
+    /// <returns>true if the difficulty is above or equal to the threshold, false otherwise.</returns>
+    public static bool IsWorkValid(string hash, string powNonce, string threshold)
+    {
+        if (string.IsNullOrEmpty(threshold))
+            throw new ArgumentException("The threshold should not be a null or empty string.", nameof(threshold));
 
-            return outputValue >= thresholdValue;
-        }
-        
-        [Obsolete("The work difficulty threshold should be explicitly specified.")]
-        public static bool IsWorkValid(string hash, string powNonce)
-        {
-            // this uses the send block difficulty threshold by default to avoid returning false positives,
-            // meaning this method may return false for a valid work for a receive block.
-            const string sendBlockDifficultyThreshold = "fffffff800000000";
-            
-            return IsWorkValid(hash, powNonce, sendBlockDifficultyThreshold);
-        }
+        byte[] thresholdBytes = threshold.HexToBytes().Reverse().ToArray();
+        ulong thresholdValue = BitConverter.ToUInt64(thresholdBytes, 0);
+
+        byte[] hashBytes = hash.HexToBytes();
+        byte[] workBytes = powNonce.HexToBytes().Reverse().ToArray();
+
+        byte[] output = Blake2BHash(8, workBytes, hashBytes);
+        ulong outputValue = BitConverter.ToUInt64(output, 0);
+
+        return outputValue >= thresholdValue;
+    }
+
+    [Obsolete("The work difficulty threshold should be explicitly specified.")]
+    public static bool IsWorkValid(string hash, string powNonce)
+    {
+        // this uses the send block difficulty threshold by default to avoid returning false positives,
+        // meaning this method may return false for a valid work for a receive block.
+        const string sendBlockDifficultyThreshold = "fffffff800000000";
+
+        return IsWorkValid(hash, powNonce, sendBlockDifficultyThreshold);
     }
 }
