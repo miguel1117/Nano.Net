@@ -156,7 +156,7 @@ public static class Utils
 
     public static byte[] PublicKeyFromAddress(string address)
     {
-        if (IsAddressValid(address, new string[] { address.Substring(0, address.IndexOf("_")) }))
+        if (IsAddressValid(address, new string[] { address.Substring(0, address.IndexOf("_", StringComparison.Ordinal)) }))
             return DecodeNanoBase32(address);
         else
             throw new ArgumentException("This Nano address isn't valid.");
