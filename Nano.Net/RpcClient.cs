@@ -153,7 +153,7 @@ public class RpcClient
         }).ConfigureAwait(false);
 
         if (pendingBlocks?.PendingBlocks != null)
-            foreach (var block in pendingBlocks?.PendingBlocks)
+            foreach (var block in pendingBlocks.PendingBlocks)
                 block.Value.Hash = block.Key;
 
         return pendingBlocks;
