@@ -61,12 +61,12 @@ public static class Utils
             stringBuilder.Append(Convert.ToString(t, 2).PadLeft(8, '0'));
 
         var binaryString = stringBuilder.ToString();
-        var result = string.Empty;
+        var result = new StringBuilder(capacity: 65);
 
         for (var i = 0; i < binaryString.Length; i += 5)
-            result += NanoAddressDecoding[binaryString.Substring(i, 5)];
+            result.Append(NanoAddressDecoding[binaryString.Substring(i, 5)]);
 
-        return result;
+        return result.ToString();
     }
 
     private static byte[] DecodeNanoBase32(string data)
