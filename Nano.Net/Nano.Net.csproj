@@ -5,20 +5,26 @@
         <LangVersion>10</LangVersion>
         <NoWarn>1570,1591</NoWarn>
         
+        <Title>Nano.Net</Title>
+        <PackageVersion>1.6.1</PackageVersion>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
-        <Title>Nano.Net</Title>
-        <PackageVersion>1.6.0</PackageVersion>
         <Description>A .NET library for the Nano cryptocurrency</Description>
         <Copyright>miguel1117</Copyright>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <PackageLicenseFile>LICENSE</PackageLicenseFile>
         <PackageProjectUrl>https://github.com/miguel1117/Nano.Net</PackageProjectUrl>
-        <PackageLicenseUrl>https://github.com/miguel1117/Nano.Net/blob/master/LICENSE</PackageLicenseUrl>
         <RepositoryUrl>https://github.com/miguel1117/Nano.Net</RepositoryUrl>
     </PropertyGroup>
 
     <ItemGroup>
         <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
         <PackageReference Include="Websocket.Client" Version="4.3.38" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Include="../README.md" Pack="true" PackagePath="/"/>
+        <None Include="../LICENSE" Pack="true" PackagePath="/"/>
     </ItemGroup>
 
 </Project>
