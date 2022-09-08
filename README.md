@@ -1,6 +1,6 @@
 # Nano.Net
 
-A .NET library for building projects with [Nano](https://nano.org). Still in development.  
+A .NET library for building projects with [nano](https://nano.org). Still in development.  
 Please feel free to submit any changes, bugfixes or new features using the issues/pull requests feature here on
 GitHub.  
 This project follows Semantic Versioning.
@@ -17,15 +17,15 @@ This project follows Semantic Versioning.
 
 ## Requirements
 
-* .NET Core 3.1 or .NET 5 and higher
+Nano.Net targets [.NET Standard 2.0](https://docs.microsoft.com/en-us/dotnet/standard/net-standard?tabs=net-standard-2-0#select-net-standard-version), which supports most .NET implementations.
 
 ## Installation
 
-You can either:
-
-* Install the package [from Nuget](https://www.nuget.org/packages/Nano.Net/).
-* Include the Nano.Net project in your project's solution and add a reference to it in your projects.
-
+Nano.Net builds are available on [Nuget](https://www.nuget.org/packages/Nano.Net/), and can be added to your project by running
+```
+dotnet add package Nano.Net
+```
+Alternatively, you can compile the project yourself.
 
 ## Usage
 
