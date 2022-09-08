@@ -147,11 +147,8 @@ public static class Utils
 
         if (!prefix.EndsWith("_"))
             prefix += "_";
-        var address = prefix;
-        address += EncodeNanoBase32(publicKey);
-        address += EncodedAddressChecksum(publicKey);
 
-        return address;
+        return prefix + EncodeNanoBase32(publicKey) + EncodedAddressChecksum(publicKey);
     }
 
     public static byte[] PublicKeyFromAddress(string address)
@@ -171,7 +168,7 @@ public static class Utils
 
         byte[] publicKey = DecodeNanoBase32(address);
 
-        var checksum = address.Substring(address.Length - 8);
+        string checksum = address.Substring(address.Length - 8);
         return EncodedAddressChecksum(publicKey) == checksum;
     }
 
