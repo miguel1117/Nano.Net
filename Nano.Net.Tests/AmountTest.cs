@@ -4,6 +4,9 @@ using Xunit;
 
 namespace Nano.Net.Tests;
 
+// BigInteger shouldn't be used in the method's arguments, because currently xunit seems to crash when
+// trying to implicitly convert an int to a BigInteger.
+
 public class AmountTest
 {
     [Theory]
@@ -25,17 +28,17 @@ public class AmountTest
     {
         Assert.Equal(BigDecimal.Parse(result), Amount.RawToNano(rawAmount));
     }
-    
+
     [Theory]
     [InlineData(1000453, 3573521, 4573974)]
-    public void AmountMath_Sum_ValidResult(BigInteger a, BigInteger b, BigInteger result)
+    public void AmountMath_Sum_ValidResult(int a, int b, int result)
     {
         Assert.Equal(result, (new Amount(a) + new Amount(b)).Raw);
     }
-    
+
     [Theory]
     [InlineData(4573974, 3573521, 1000453)]
-    public void AmountMath_Subtract_ValidResult(BigInteger a, BigInteger b, BigInteger result)
+    public void AmountMath_Subtract_ValidResult(int a, int b, int result)
     {
         Assert.Equal(result, (new Amount(a) - new Amount(b)).Raw);
     }
@@ -43,12 +46,12 @@ public class AmountTest
     [Fact]
     public void AmountComparison_SameValue_Equal()
     {
-        Assert.True(new Amount(15) == new Amount(15));
+        Assert.Equal(new Amount(15), new Amount(15));
     }
-    
+
     [Fact]
     public void AmountComparison_DifferentValues_Different()
     {
-        Assert.True(new Amount(15) != new Amount(25));
+        Assert.NotEqual(new Amount(15), new Amount(25));
     }
 }
