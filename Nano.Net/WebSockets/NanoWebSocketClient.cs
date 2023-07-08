@@ -1,8 +1,7 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.WebSockets;
-using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -37,6 +36,11 @@ public class NanoWebSocketClient : IDisposable
     /// Returns a copy of this client's subscriptions.
     /// </summary>
     public Topic[] Subscriptions => _subscriptions.Select(x => x.Value).ToArray();
+
+    /// <summary>
+    /// Returns true if the client is connected to the server and running.
+    /// </summary>
+    public bool IsRunning => _clientWebSocket.IsRunning;
 
     private readonly Dictionary<string, Topic> _subscriptions = new Dictionary<string, Topic>();
     private readonly WebsocketClient _clientWebSocket;
