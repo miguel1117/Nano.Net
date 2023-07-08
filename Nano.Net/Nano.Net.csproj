@@ -6,7 +6,7 @@
         <NoWarn>1570,1591</NoWarn>
         
         <Title>Nano.Net</Title>
-        <PackageVersion>1.6.1</PackageVersion>
+        <PackageVersion>1.7.0</PackageVersion>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <Description>A .NET library for the Nano cryptocurrency</Description>
