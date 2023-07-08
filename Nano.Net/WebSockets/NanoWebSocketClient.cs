@@ -37,6 +37,11 @@ public class NanoWebSocketClient : IDisposable
     /// </summary>
     public Topic[] Subscriptions => _subscriptions.Select(x => x.Value).ToArray();
 
+    /// <summary>
+    /// Returns true if the client is connected to the server and running.
+    /// </summary>
+    public bool IsRunning => _clientWebSocket.IsRunning;
+
     private readonly Dictionary<string, Topic> _subscriptions = new Dictionary<string, Topic>();
     private readonly WebsocketClient _clientWebSocket;
     private TaskCompletionSource<PingMessage> _pingResponseMessage;
