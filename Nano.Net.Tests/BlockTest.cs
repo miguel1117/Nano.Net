@@ -1,4 +1,5 @@
 ﻿using System;
+using Nano.Net.Exceptions;
 using Nano.Net.Extensions;
 using Xunit;
 
@@ -25,14 +26,14 @@ public class BlockTest
     [Fact]
     public void SignBlock_WrongKey_ThrowsException()
     {
-        Assert.Throws<Exception>(() => _testBlock.Sign("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF".HexToBytes()));
+        Assert.Throws<SigningException>(() => _testBlock.Sign("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF".HexToBytes()));
     }
 
     [Fact]
     public void SignBlock_ValidateSignature_ValidSignature()
     {
         _testBlock.Sign("A066701E0641E524662E3B7F67F98A248C300017BAA8AA0D91A95A2BCAF8D4D8".HexToBytes());
-        
+
         Assert.Equal("E1A909D04D2E45199A2F17DF31CFE28203A5593173FB67F12ACB6C26E0B97712542BE472116D3CBC41B480C74CAB95FCB592CE73A21457B6ACF33100E706E500",
             _testBlock.Signature, true);
     }
