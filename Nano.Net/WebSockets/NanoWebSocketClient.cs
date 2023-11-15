@@ -148,8 +148,15 @@ public class NanoWebSocketClient : IDisposable
         _clientWebSocket.Send(request);
     }
 
-    // maybe there is a better way to do this, but i just can't imagine any right now
-    public async Task<PingMessage> Ping()
+    /// <summary>
+    /// Sends a ping and waits for a pong.
+    /// </summary>
+    /// <remarks>
+    /// Due to the way this was implemented, the Time property of the returned PingMessage may represent a moment in time prior to the method call.
+    /// </remarks>
+    /// <param name="timeout">How long seconds to wait for a pong. Set to -1 milliseconds to disable the timeout.</param>
+    /// <returns>A PingMessage representing the returned message.</returns>
+    public async Task<PingMessage> Ping(TimeSpan? timeout = null)
     {
         if (!_clientWebSocket.IsStarted)
             throw new NanoWebSocketException("This client hasn't been started yet.");
@@ -157,7 +164,9 @@ public class NanoWebSocketClient : IDisposable
         _pingResponseMessage = new TaskCompletionSource<PingMessage>();
         _clientWebSocket.Send("{ \"action\": \"ping\" }");
 
-        if (await Task.WhenAny(_pingResponseMessage.Task, Task.Delay(10000)) == _pingResponseMessage.Task)
+        timeout ??= TimeSpan.FromSeconds(10);
+        var timeoutTask = Task.WhenAny(_pingResponseMessage.Task, Task.Delay(timeout.Value)).ConfigureAwait(false);
+        if (await timeoutTask == _pingResponseMessage.Task)
             return _pingResponseMessage.Task.Result;
         else
             throw new NanoWebSocketException("Ping timeout exceeded.");
