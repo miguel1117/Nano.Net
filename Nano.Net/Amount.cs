@@ -6,7 +6,7 @@ using Nano.Net.Numbers;
 namespace Nano.Net;
 
 [DataContract]
-public class Amount : IEquatable<Amount>
+public class Amount : IEquatable<Amount>, IComparable<Amount>
 {
     [DataMember]
     public BigInteger Raw { get; }
@@ -126,5 +126,10 @@ public class Amount : IEquatable<Amount>
     public override int GetHashCode()
     {
         return Raw.GetHashCode();
+    }
+
+    public int CompareTo(Amount other)
+    {
+        return other is null ? 1 : Raw.CompareTo(other.Raw);
     }
 }
