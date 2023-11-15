@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Numerics;
 using Chaos.NaCl;
+using Nano.Net.Exceptions;
 using Nano.Net.Extensions;
 using Newtonsoft.Json;
 using static Nano.Net.Utils;
@@ -148,12 +149,12 @@ public class Block : BlockBase
     /// Sign this block using the provided private key and set its Signature property
     /// </summary>
     /// <param name="privateKey">The private key for this block's account.</param>
-    /// <exception cref="Exception">The provided private key doesn't match the public key for this block.</exception>
+    /// <exception cref="SigningException">The provided private key doesn't match the public key for this block.</exception>
     public void Sign(byte[] privateKey)
     {
         // check if the private key matches this block's account public key
         if (!PublicKeyFromPrivateKey(privateKey).SequenceEqual(PublicKeyFromAddress(Account)))
-            throw new Exception("The private key doesn't match this block's account public key.");
+            throw new SigningException("The private key doesn't match this block's account public key.");
 
         Ed25519.KeyPairFromSeed(out byte[] _, out byte[] expandedPrivateKey, privateKey);
 
