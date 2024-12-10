@@ -1,4 +1,4 @@
-﻿// This is a modified version of the code from https://github.com/Flufd/NanoDotNet/blob/master/NanoDotNet/NanoRpcClient.cs
+// This is a modified version of the code from https://github.com/Flufd/NanoDotNet/blob/master/NanoDotNet/NanoRpcClient.cs
 
 using System.Collections.Generic;
 using System.Net.Http;
@@ -40,7 +40,7 @@ public class RpcClient
         NodeAddress = nodeUri;
     }
 
-    private async Task<T> RpcRequestAsync<T>(object request)
+    public async Task<T> RpcRequestAsync<T>(object request)
     {
         string serializedBlock = JsonConvert.SerializeObject(request, _jsonSerializerSettings);
         var content = new StringContent(serializedBlock, Encoding.UTF8, "application/json");
